@@ -1,0 +1,118 @@
+[
+  {
+    "id": "sd-2026-09",
+    "title": "【訓練】安否確認",
+    "body": "防災訓練の安否確認です。現在の場所と状態を選んで送信してください。30秒程度で終わります。\n\n※ これは訓練です。実災害ではありません。",
+    "startedAt": "2026-09-22T10:00:00+09:00",
+    "active": true,
+    "isDrill": true,
+    "targetUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-takahashi",
+      "u-suzuki",
+      "u-hayashi",
+      "u-kobayashi",
+      "u-ito",
+      "u-inoue",
+      "u-watanabe",
+      "u-nakamura",
+      "u-yoshida",
+      "u-matsumoto",
+      "u-okada",
+      "u-admin"
+    ],
+    "responses": [
+      {
+        "userId": "u-yamada",
+        "location": "hospital",
+        "condition": "ok",
+        "canCome": true,
+        "respondedAt": "2026-09-22T10:07:00+09:00"
+      },
+      {
+        "userId": "u-sato",
+        "location": "home",
+        "condition": "ok",
+        "canCome": true,
+        "respondedAt": "2026-09-22T10:10:00+09:00"
+      },
+      {
+        "userId": "u-takahashi",
+        "location": "hospital",
+        "condition": "ok",
+        "canCome": true,
+        "comment": "臨床工学室に待機しています",
+        "respondedAt": "2026-09-22T10:13:00+09:00"
+      },
+      {
+        "userId": "u-suzuki",
+        "location": "home",
+        "condition": "ok",
+        "canCome": false,
+        "comment": "交通機関が止まっており参集に時間がかかります",
+        "respondedAt": "2026-09-22T10:16:00+09:00"
+      },
+      {
+        "userId": "u-kobayashi",
+        "location": "hospital",
+        "condition": "ok",
+        "canCome": true,
+        "respondedAt": "2026-09-22T10:19:00+09:00"
+      },
+      {
+        "userId": "u-ito",
+        "location": "home",
+        "condition": "minor_injury",
+        "canCome": false,
+        "comment": "自宅で軽い切り傷。受診は不要です",
+        "respondedAt": "2026-09-22T10:22:00+09:00"
+      },
+      {
+        "userId": "u-inoue",
+        "location": "hospital",
+        "condition": "ok",
+        "canCome": true,
+        "respondedAt": "2026-09-22T10:25:00+09:00"
+      },
+      {
+        "userId": "u-watanabe",
+        "location": "other",
+        "condition": "ok",
+        "canCome": true,
+        "comment": "外勤先から向かいます",
+        "respondedAt": "2026-09-22T10:28:00+09:00"
+      },
+      {
+        "userId": "u-yoshida",
+        "location": "home",
+        "condition": "ok",
+        "canCome": true,
+        "respondedAt": "2026-09-22T10:31:00+09:00"
+      },
+      {
+        "userId": "u-matsumoto",
+        "location": "home",
+        "condition": "need_support",
+        "canCome": false,
+        "comment": "自宅の被害が大きく参集できません",
+        "respondedAt": "2026-09-22T10:34:00+09:00"
+      },
+      {
+        "userId": "u-okada",
+        "location": "hospital",
+        "condition": "ok",
+        "canCome": true,
+        "respondedAt": "2026-09-22T10:37:00+09:00"
+      },
+      {
+        "userId": "u-admin",
+        "location": "hospital",
+        "condition": "ok",
+        "canCome": true,
+        "respondedAt": "2026-09-22T10:40:00+09:00"
+      }
+    ]
+  }
+]

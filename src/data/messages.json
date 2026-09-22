@@ -1,0 +1,817 @@
+[
+  {
+    "id": "m-ce-01",
+    "roomId": "room-ce",
+    "senderId": "u-takahashi",
+    "type": "announcement",
+    "body": "今年度の研修計画を掲示しました。各自、受講予定を確認してください。",
+    "createdAt": "2026-09-18T09:00:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-takahashi",
+      "u-suzuki",
+      "u-hayashi",
+      "u-okada"
+    ],
+    "title": "今年度 研修計画の掲示について"
+  },
+  {
+    "id": "m-dm-matsumoto-01",
+    "roomId": "room-dm-matsumoto",
+    "senderId": "u-matsumoto",
+    "type": "text",
+    "body": "備品請求の締め切りは今週金曜です。",
+    "createdAt": "2026-09-18T10:00:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-matsumoto"
+    ]
+  },
+  {
+    "id": "m-ecmo-01",
+    "roomId": "room-ecmo",
+    "senderId": "u-takahashi",
+    "type": "announcement",
+    "body": "10月の院内研修（第2回）の日程が決まりました。参加できる方は事前に登録をお願いします。対象は ECMO 対応チームの全員です。",
+    "createdAt": "2026-09-19T15:20:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-suzuki",
+      "u-takahashi",
+      "u-hayashi",
+      "u-watanabe",
+      "u-nakamura",
+      "u-kobayashi"
+    ],
+    "title": "ECMO 研修（第2回）のご案内"
+  },
+  {
+    "id": "m-dm-suzuki-01",
+    "roomId": "room-dm-suzuki",
+    "senderId": "u-suzuki",
+    "type": "text",
+    "body": "点検表のフォーマット、去年のものでよいでしょうか。",
+    "createdAt": "2026-09-19T16:10:00+09:00",
+    "readUserIds": [
+      "u-suzuki"
+    ]
+  },
+  {
+    "id": "m-ce-02",
+    "roomId": "room-ce",
+    "senderId": "u-yamada",
+    "type": "image",
+    "body": "機器室の棚を整理しました。置き場所が変わっているので写真を共有します。",
+    "createdAt": "2026-09-19T17:30:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-takahashi",
+      "u-suzuki",
+      "u-hayashi",
+      "u-okada"
+    ],
+    "attachments": [
+      {
+        "id": "a-ce-1",
+        "kind": "image",
+        "name": "機器室_棚配置.jpg",
+        "size": "1.2 MB",
+        "mime": "image/jpeg",
+        "accent": "#2f9e6f",
+        "caption": "機器室の棚配置（デモ用のダミー画像）"
+      }
+    ]
+  },
+  {
+    "id": "m-ce-03",
+    "roomId": "room-ce",
+    "senderId": "u-sato",
+    "type": "text",
+    "body": "ありがとうございます。ラベルも貼り替えておきます。",
+    "createdAt": "2026-09-19T17:42:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-takahashi",
+      "u-suzuki",
+      "u-hayashi",
+      "u-okada"
+    ]
+  },
+  {
+    "id": "m-myroom-03",
+    "roomId": "room-myroom",
+    "senderId": "u-naito",
+    "type": "file",
+    "body": "学会発表のスライド下書き。締め切り前に見直す。",
+    "createdAt": "2026-09-19T21:30:00+09:00",
+    "readUserIds": [
+      "u-naito"
+    ],
+    "attachments": [
+      {
+        "id": "a-my-1",
+        "kind": "file",
+        "name": "発表スライド_下書き.pptx",
+        "size": "3.1 MB",
+        "mime": "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+      }
+    ]
+  },
+  {
+    "id": "m-tavi-01",
+    "roomId": "room-tavi",
+    "senderId": "u-nakamura",
+    "type": "file",
+    "body": "来週の症例について、役割分担のたたき台を作りました。過不足があれば教えてください。",
+    "createdAt": "2026-09-21T10:00:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-nakamura",
+      "u-watanabe",
+      "u-yoshida",
+      "u-inoue"
+    ],
+    "attachments": [
+      {
+        "id": "a-tavi-1",
+        "kind": "file",
+        "name": "役割分担_TAVI_10月.pdf",
+        "size": "220 KB",
+        "mime": "application/pdf"
+      }
+    ]
+  },
+  {
+    "id": "m-tavi-02",
+    "roomId": "room-tavi",
+    "senderId": "u-yoshida",
+    "type": "text",
+    "body": "放射線部は記載の時間で対応可能です。",
+    "createdAt": "2026-09-21T10:30:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-nakamura",
+      "u-watanabe",
+      "u-yoshida",
+      "u-inoue"
+    ]
+  },
+  {
+    "id": "m-dm-takahashi-01",
+    "roomId": "room-dm-takahashi",
+    "senderId": "u-takahashi",
+    "type": "file",
+    "body": "来週の会議資料、目を通しておいてください。",
+    "createdAt": "2026-09-21T11:00:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-takahashi"
+    ],
+    "attachments": [
+      {
+        "id": "a-dm-1",
+        "kind": "file",
+        "name": "定例会議資料_0928.pdf",
+        "size": "680 KB",
+        "mime": "application/pdf"
+      }
+    ]
+  },
+  {
+    "id": "m-trouble-01",
+    "roomId": "room-trouble",
+    "senderId": "system",
+    "type": "system",
+    "body": "機器トラブル報告 T-2026-0918 が「対応済」になりました。",
+    "createdAt": "2026-09-21T13:30:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-takahashi",
+      "u-suzuki",
+      "u-hayashi",
+      "u-okada",
+      "u-kobayashi",
+      "u-ito",
+      "u-yoshida",
+      "u-matsumoto",
+      "u-admin"
+    ]
+  },
+  {
+    "id": "m-trouble-02",
+    "roomId": "room-trouble",
+    "senderId": "u-takahashi",
+    "type": "text",
+    "body": "報告の際は、管理番号と発生場所を必ず入れてください。対応が早くなります。",
+    "createdAt": "2026-09-21T13:45:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-suzuki",
+      "u-hayashi",
+      "u-okada",
+      "u-kobayashi",
+      "u-ito",
+      "u-takahashi"
+    ]
+  },
+  {
+    "id": "m-cpb-01",
+    "roomId": "room-cpb",
+    "senderId": "u-yamada",
+    "type": "file",
+    "body": "来月の定期点検の日程候補をまとめました。都合を確認して返信をお願いします。",
+    "createdAt": "2026-09-21T14:00:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-suzuki",
+      "u-takahashi",
+      "u-watanabe"
+    ],
+    "attachments": [
+      {
+        "id": "a-cpb-1",
+        "kind": "file",
+        "name": "定期点検_日程候補_10月.xlsx",
+        "size": "38 KB",
+        "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      }
+    ]
+  },
+  {
+    "id": "m-or-ce-01",
+    "roomId": "room-or-ce",
+    "senderId": "u-inoue",
+    "type": "file",
+    "body": "明日の手術室予定表を更新しました。開始時刻の変更が2件あります。",
+    "createdAt": "2026-09-21T16:40:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-takahashi",
+      "u-suzuki",
+      "u-kobayashi",
+      "u-ito",
+      "u-inoue"
+    ],
+    "attachments": [
+      {
+        "id": "a-or-1",
+        "kind": "file",
+        "name": "手術室予定表_0922.pdf",
+        "size": "412 KB",
+        "mime": "application/pdf"
+      }
+    ]
+  },
+  {
+    "id": "m-or-ce-02",
+    "roomId": "room-or-ce",
+    "senderId": "u-yamada",
+    "type": "text",
+    "body": "確認しました。CE の担当割りもあわせて更新します。",
+    "createdAt": "2026-09-21T16:52:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-takahashi",
+      "u-suzuki",
+      "u-kobayashi",
+      "u-ito",
+      "u-inoue"
+    ]
+  },
+  {
+    "id": "m-or-ce-03",
+    "roomId": "room-or-ce",
+    "senderId": "u-naito",
+    "type": "text",
+    "body": "ありがとうございます。搬入の準備は今日中に済ませておきます。",
+    "createdAt": "2026-09-21T17:10:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-takahashi",
+      "u-suzuki",
+      "u-kobayashi",
+      "u-ito",
+      "u-inoue"
+    ]
+  },
+  {
+    "id": "m-dm-yamada-02",
+    "roomId": "room-dm-yamada",
+    "senderId": "u-naito",
+    "type": "text",
+    "body": "はい、9時で問題ありません。",
+    "createdAt": "2026-09-21T18:20:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada"
+    ]
+  },
+  {
+    "id": "m-dm-inoue-01",
+    "roomId": "room-dm-inoue",
+    "senderId": "u-inoue",
+    "type": "text",
+    "body": "先日はありがとうございました。手術室のスタッフにも共有しました。",
+    "createdAt": "2026-09-21T19:05:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-inoue"
+    ]
+  },
+  {
+    "id": "m-dm-inoue-02",
+    "roomId": "room-dm-inoue",
+    "senderId": "u-naito",
+    "type": "text",
+    "body": "こちらこそ助かりました。またよろしくお願いします。",
+    "createdAt": "2026-09-21T19:20:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-inoue"
+    ]
+  },
+  {
+    "id": "m-myroom-02",
+    "roomId": "room-myroom",
+    "senderId": "u-naito",
+    "type": "url",
+    "body": "院内ポータルのナレッジ検索",
+    "createdAt": "2026-09-21T20:10:00+09:00",
+    "readUserIds": [
+      "u-naito"
+    ],
+    "link": {
+      "url": "https://portal.hospital.local/knowledge",
+      "title": "院内ナレッジ検索",
+      "site": "院内ポータル",
+      "description": "マニュアル・FAQ・教育コンテンツを横断検索"
+    }
+  },
+  {
+    "id": "m-ecmo-02",
+    "roomId": "room-ecmo",
+    "senderId": "u-takahashi",
+    "type": "text",
+    "body": "管理番号 E-0032 の機器は、定期点検のため本日は終日使用できません。\n使用前に管理番号を確認し、E-0032 を見かけた場合は臨床工学室（内線 5120）まで連絡してください。\n\n※ これはデモ用のダミー通知です。実際の運用指示ではありません。",
+    "createdAt": "2026-09-22T07:40:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-suzuki",
+      "u-hayashi",
+      "u-watanabe",
+      "u-nakamura",
+      "u-takahashi"
+    ],
+    "priority": "emergency",
+    "title": "管理番号 E-0032 使用停止（点検のため）",
+    "pinned": true,
+    "ack": {
+      "required": true,
+      "confirmedUserIds": [
+        "u-yamada",
+        "u-suzuki",
+        "u-hayashi",
+        "u-takahashi",
+        "u-kobayashi"
+      ]
+    }
+  },
+  {
+    "id": "m-myroom-01",
+    "roomId": "room-myroom",
+    "senderId": "u-naito",
+    "type": "text",
+    "body": "【今日やること】\n・E-0032 の点検結果を確認\n・TAVI チェックリストの追記\n・来月の点検日程を返信",
+    "createdAt": "2026-09-22T07:55:00+09:00",
+    "readUserIds": [
+      "u-naito"
+    ]
+  },
+  {
+    "id": "m-or-ce-04",
+    "roomId": "room-or-ce",
+    "senderId": "system",
+    "type": "system",
+    "body": "山田 さんが 岡田 さんをグループに追加しました。",
+    "createdAt": "2026-09-22T08:05:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-takahashi",
+      "u-suzuki",
+      "u-kobayashi",
+      "u-ito",
+      "u-inoue"
+    ]
+  },
+  {
+    "id": "m-ce-04",
+    "roomId": "room-ce",
+    "senderId": "u-takahashi",
+    "type": "text",
+    "body": "今週の申し送りはこのルームにまとめます。個別の連絡は各グループでお願いします。",
+    "createdAt": "2026-09-22T08:10:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-takahashi",
+      "u-suzuki",
+      "u-hayashi",
+      "u-okada"
+    ]
+  },
+  {
+    "id": "m-ce-05",
+    "roomId": "room-ce",
+    "senderId": "u-naito",
+    "type": "text",
+    "body": "承知しました。",
+    "createdAt": "2026-09-22T08:14:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-takahashi",
+      "u-suzuki",
+      "u-hayashi",
+      "u-okada"
+    ]
+  },
+  {
+    "id": "m-ecmo-03",
+    "roomId": "room-ecmo",
+    "senderId": "u-suzuki",
+    "type": "text",
+    "body": "確認しました。該当機器は臨床工学室で預かっています。",
+    "createdAt": "2026-09-22T08:15:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-suzuki",
+      "u-takahashi",
+      "u-hayashi",
+      "u-watanabe",
+      "u-nakamura",
+      "u-kobayashi"
+    ]
+  },
+  {
+    "id": "m-or-ce-05",
+    "roomId": "room-or-ce",
+    "senderId": "u-yamada",
+    "type": "text",
+    "body": "おはようございます。本日の担当割りをホワイトボードに掲示しました。変更があれば早めに連絡してください。",
+    "createdAt": "2026-09-22T08:32:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-takahashi",
+      "u-suzuki",
+      "u-kobayashi",
+      "u-ito",
+      "u-inoue"
+    ],
+    "reactions": [
+      {
+        "emoji": "👍",
+        "userIds": [
+          "u-naito",
+          "u-sato",
+          "u-suzuki"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "m-tavi-03",
+    "roomId": "room-tavi",
+    "senderId": "u-yamada",
+    "type": "form",
+    "body": "10月の TAVI 勉強会について、参加できる日を選んでください。",
+    "createdAt": "2026-09-22T08:50:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-nakamura",
+      "u-watanabe",
+      "u-yoshida",
+      "u-inoue"
+    ],
+    "poll": {
+      "question": "10月の TAVI 勉強会 参加可能日",
+      "multiple": true,
+      "options": [
+        {
+          "id": "o1",
+          "label": "10/7（水）18:00〜",
+          "voterIds": [
+            "u-naito",
+            "u-sato",
+            "u-yoshida"
+          ]
+        },
+        {
+          "id": "o2",
+          "label": "10/14（水）18:00〜",
+          "voterIds": [
+            "u-yamada",
+            "u-nakamura"
+          ]
+        },
+        {
+          "id": "o3",
+          "label": "10/21（水）18:00〜",
+          "voterIds": [
+            "u-inoue"
+          ]
+        },
+        {
+          "id": "o4",
+          "label": "どの日も参加できない",
+          "voterIds": []
+        }
+      ],
+      "closesAt": "2026-09-30T18:00:00+09:00"
+    }
+  },
+  {
+    "id": "m-or-ce-06",
+    "roomId": "room-or-ce",
+    "senderId": "u-kobayashi",
+    "type": "text",
+    "body": "第3手術室、開始が30分遅れると連絡がありました。関係者への共有をお願いします。",
+    "createdAt": "2026-09-22T08:58:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-takahashi",
+      "u-suzuki",
+      "u-kobayashi",
+      "u-ito",
+      "u-inoue"
+    ]
+  },
+  {
+    "id": "m-or-ce-07",
+    "roomId": "room-or-ce",
+    "senderId": "u-naito",
+    "type": "text",
+    "body": "了解しました。機器の準備は先に済ませておきます。",
+    "createdAt": "2026-09-22T09:05:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-takahashi",
+      "u-suzuki",
+      "u-kobayashi",
+      "u-ito",
+      "u-inoue"
+    ],
+    "replyToId": "m-or-ce-06"
+  },
+  {
+    "id": "m-trouble-03",
+    "roomId": "room-trouble",
+    "senderId": "u-ito",
+    "type": "text",
+    "body": "🔧 機器トラブル報告\n\n機器：輸液ポンプ\n管理番号：P-1234\n場所：ICU\n緊急度：中（早めの対応が必要）\n\n症状：\n閉塞アラームが繰り返し表示されます。別の個体に入れ替えて対応中です。",
+    "createdAt": "2026-09-22T09:21:00+09:00",
+    "readUserIds": [
+      "u-yamada",
+      "u-sato",
+      "u-takahashi",
+      "u-ito"
+    ],
+    "title": "機器トラブル報告 T-2026-0922-01",
+    "priority": "important"
+  },
+  {
+    "id": "m-ecmo-04",
+    "roomId": "room-ecmo",
+    "senderId": "u-hayashi",
+    "type": "text",
+    "body": "点検の完了予定が出たら、このルームで共有します。",
+    "createdAt": "2026-09-22T09:30:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-suzuki",
+      "u-takahashi",
+      "u-hayashi",
+      "u-watanabe",
+      "u-nakamura",
+      "u-kobayashi"
+    ]
+  },
+  {
+    "id": "m-tavi-04",
+    "roomId": "room-tavi",
+    "senderId": "ai",
+    "type": "ai",
+    "body": "このルームの直近24時間（12件）を要約しました。\n\n【決定事項】\n・来週の症例の役割分担はたたき台どおりで確定\n・放射線部は記載の時間で対応可能\n\n【対応が必要】\n・勉強会の参加可能日の回答（未回答 3 名）\n・チェックリストの最終版を共有ノートへ反映\n\n【参考情報】\n・前日搬入の時間は従来どおり",
+    "createdAt": "2026-09-22T09:40:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-nakamura",
+      "u-watanabe",
+      "u-yoshida",
+      "u-inoue"
+    ]
+  },
+  {
+    "id": "m-cpb-02",
+    "roomId": "room-cpb",
+    "senderId": "u-watanabe",
+    "type": "text",
+    "body": "来週の予定を確認しました。ありがとうございます。",
+    "createdAt": "2026-09-22T09:45:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-suzuki",
+      "u-takahashi",
+      "u-watanabe"
+    ]
+  },
+  {
+    "id": "m-ecmo-05",
+    "roomId": "room-ecmo",
+    "senderId": "u-watanabe",
+    "type": "text",
+    "body": "承知しました。代替機の所在だけ教えてください。",
+    "createdAt": "2026-09-22T10:12:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-suzuki",
+      "u-takahashi",
+      "u-watanabe"
+    ]
+  },
+  {
+    "id": "m-tavi-05",
+    "roomId": "room-tavi",
+    "senderId": "u-naito",
+    "type": "url",
+    "body": "チェックリストの最新版は院内ポータルにあります。",
+    "createdAt": "2026-09-22T10:15:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-nakamura",
+      "u-watanabe",
+      "u-yoshida",
+      "u-inoue"
+    ],
+    "link": {
+      "url": "https://portal.hospital.local/ce/tavi/checklist",
+      "title": "TAVI 準備チェックリスト（臨床工学室）",
+      "site": "院内ポータル",
+      "description": "搬入・準備・撤収の手順を一覧にしたチェックリスト（院内限定）"
+    }
+  },
+  {
+    "id": "m-tavi-06",
+    "roomId": "room-tavi",
+    "senderId": "u-sato",
+    "type": "text",
+    "body": "ありがとうございます。印刷して手術室に置いておきます。",
+    "createdAt": "2026-09-22T10:22:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-nakamura",
+      "u-watanabe",
+      "u-sato"
+    ]
+  },
+  {
+    "id": "m-ecmo-06",
+    "roomId": "room-ecmo",
+    "senderId": "u-yamada",
+    "type": "text",
+    "body": "代替機は臨床工学室に用意しています。必要なときは内線 5122 へ。",
+    "createdAt": "2026-09-22T10:26:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-suzuki",
+      "u-takahashi",
+      "u-hayashi",
+      "u-yamada"
+    ]
+  },
+  {
+    "id": "m-cpb-03",
+    "roomId": "room-cpb",
+    "senderId": "u-suzuki",
+    "type": "text",
+    "body": "回路についてですが、次回の定期点検の日程を調整したいです。都合の良い日を教えてください。",
+    "createdAt": "2026-09-22T11:30:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-suzuki",
+      "u-takahashi",
+      "u-watanabe"
+    ]
+  },
+  {
+    "id": "m-or-ce-08",
+    "roomId": "room-or-ce",
+    "senderId": "u-ito",
+    "type": "text",
+    "body": "午前に使用した機器を返却しました。所定の場所に戻しています。",
+    "createdAt": "2026-09-22T11:48:00+09:00",
+    "readUserIds": [
+      "u-naito",
+      "u-yamada",
+      "u-sato",
+      "u-takahashi",
+      "u-suzuki",
+      "u-ito"
+    ]
+  },
+  {
+    "id": "m-or-ce-09",
+    "roomId": "room-or-ce",
+    "senderId": "u-kobayashi",
+    "type": "text",
+    "body": "午後の1件、器材の準備を先にお願いできますか。",
+    "createdAt": "2026-09-22T12:20:00+09:00",
+    "readUserIds": [
+      "u-yamada",
+      "u-sato",
+      "u-kobayashi"
+    ]
+  },
+  {
+    "id": "m-or-ce-10",
+    "roomId": "room-or-ce",
+    "senderId": "u-yamada",
+    "type": "text",
+    "body": "対応します。準備ができたら連絡します。",
+    "createdAt": "2026-09-22T12:33:00+09:00",
+    "readUserIds": [
+      "u-sato",
+      "u-yamada"
+    ]
+  },
+  {
+    "id": "m-or-ce-11",
+    "roomId": "room-or-ce",
+    "senderId": "u-sato",
+    "type": "text",
+    "body": "明日の TAVI について確認です。前日搬入の時間はいつも通りで問題ないでしょうか。",
+    "createdAt": "2026-09-22T12:45:00+09:00",
+    "readUserIds": [
+      "u-yamada",
+      "u-sato"
+    ]
+  },
+  {
+    "id": "m-dm-yamada-01",
+    "roomId": "room-dm-yamada",
+    "senderId": "u-yamada",
+    "type": "text",
+    "body": "内藤さん、明日の搬入、9時からで大丈夫ですか。",
+    "createdAt": "2026-09-22T12:52:00+09:00",
+    "readUserIds": [
+      "u-yamada"
+    ]
+  }
+]
