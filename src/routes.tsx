@@ -29,6 +29,9 @@ import { TroubleNewPage } from '@/features/trouble/TroubleNewPage'
 
 const chatHandle: RouteHandle = { fullscreenOnMobile: true }
 
+/** 配信先のサブディレクトリ。vite.config.ts の base と必ず一致する */
+const basename = import.meta.env.BASE_URL.replace(/\/+$/, '')
+
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
   {
@@ -61,4 +64,4 @@ export const router = createBrowserRouter([
       { path: '*', element: <NotFoundPage /> },
     ],
   },
-])
+], basename ? { basename } : undefined)

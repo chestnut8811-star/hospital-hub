@@ -6,6 +6,21 @@
 > 表示されるデータはすべて架空です。実在の患者情報・職員情報は含みません。
 > 臨床判断には使用しないでください。
 
+## 公開先
+
+**https://chestnut8811-star.github.io/hospital-hub/**
+
+Chrome・Safari・スマホのブラウザから、Mac を起動していなくても開けます。
+GitHub Pages（`gh-pages` ブランチ）で配信しています。
+
+更新したいときは:
+
+```bash
+npm run deploy
+```
+
+`npm run build` してから `dist/` を `gh-pages` ブランチへ push します。反映まで1分ほどかかります。
+
 ## 動かす
 
 ```bash
@@ -19,14 +34,17 @@ npm run dev      # http://localhost:5180
 | `npm run build` | 型チェック（tsc -b）＋本番ビルド |
 | `npm run preview` | ビルド結果の確認（ポート 4180・同じ Wi-Fi から見える） |
 | `npm run lint` | oxlint |
+| `npm run deploy` | ビルドして GitHub Pages（gh-pages ブランチ）へ公開 |
 
 ## スマホで使う
 
 開発サーバーは同じ Wi-Fi の端末から見えるように設定してあります（`vite.config.ts` の `server.host`）。
 
 1. Mac で `npm run dev` を実行する
-2. 表示される **`Network: http://<MacのIP>:5180/`** をスマホのブラウザで開く
+2. 表示される **`Network: http://<MacのIP>:5180/hospital-hub/`** をスマホのブラウザで開く
    （IP は `ipconfig getifaddr en0` で確認できます）
+
+公開版（GitHub Pages）を使う場合はこの手順は不要です。上の公開URLをそのまま開いてください。
 3. ホーム画面に追加すると、アドレスバーの無い全画面で開きます
    - iPhone（Safari）: 共有ボタン →「ホーム画面に追加」
    - Android（Chrome）: メニュー →「アプリをインストール」または「ホーム画面に追加」
@@ -83,6 +101,7 @@ src/
 ## 設計の要点
 
 - **外部通信ゼロ**。フォント（Geist Variable）を含め依存はすべて npm 同梱。CDN・解析タグを持たない
+  （GitHub Pages で配信していても、アプリが外部へ通信することはありません）
 - **ホーム画面に追加できる**。マニフェストとアイコンを同梱（`public/manifest.webmanifest`）。
   Service Worker はまだ入れていないので、オフライン起動は Phase 6 の範囲
 - **モバイルファースト**。スマホは 下部ナビ3タブ、PC（lg 以上）は サイドバー＋2ペイン
@@ -96,3 +115,18 @@ src/
 認証 → DB → リアルタイム → ファイルアップロード → プッシュ通知 → 院内ナレッジ（RAG）→ AI → 管理。
 バックエンドを繋ぐときは `src/repositories/hubRepository.ts` の実装を追加し、
 ストアの初期化をそこから読むように差し替えます。画面側の変更は不要な構成にしてあります。
+
+## 配信先を変えるとき
+
+GitHub Pages はリポジトリ名のサブディレクトリで配信されるため、3か所を揃えています。
+院内サーバのルート直下に置くときは、いずれも `/` に戻してください。
+
+| 場所 | 現在の値 |
+|---|---|
+| `vite.config.ts` の `base` | `/hospital-hub/` |
+| `src/routes.tsx` の `basename` | `base` から自動で算出（変更不要） |
+| `public/manifest.webmanifest` の `start_url` / `scope` | `./`（相対なので変更不要） |
+
+GitHub Pages には SPA のフォールバックが無いので、ビルド時に `index.html` と同じ内容の
+`404.html` を生成しています（`vite.config.ts` の `spaFallback` プラグイン）。
+これがないと `/hospital-hub/groups` を直接開いたときに 404 になります。

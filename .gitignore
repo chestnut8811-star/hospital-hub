@@ -25,3 +25,9 @@ dist-ssr
 
 # ブラウザ検証の生成物
 .playwright-mcp/
+
+# Claude Code の作業メモ（配布物には含めない）
+.claude/
+
+# 公開用の一時作業ツリー
+.gh-pages/
