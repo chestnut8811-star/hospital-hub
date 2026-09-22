@@ -1,5 +1,5 @@
 /**
- * お知らせ一覧（設計書 §11）。
+ * お知らせ一覧（設計指示 §11）。
  * 未読が一目で分かることと、カテゴリー・検索で目的の連絡に辿り着けることを優先する。
  */
 import { Megaphone, Plus, Search } from 'lucide-react'
@@ -22,6 +22,7 @@ import {
 import { AnnouncementComposeDialog } from '@/features/announcements/AnnouncementComposeDialog'
 import { formatDateTime } from '@/lib/format'
 import { matchesQuery } from '@/lib/search'
+import { isTargeted } from '@/lib/targeting'
 import { cn } from '@/lib/utils'
 import { useAnnouncements } from '@/stores/hubStore'
 import { useCurrentUser } from '@/stores/sessionStore'
@@ -38,24 +39,34 @@ export function AnnouncementListPage() {
   const [category, setCategory] = useState(ALL_CATEGORIES)
   const [composeOpen, setComposeOpen] = useState(false)
 
+  /**
+   * 自分に配信されたお知らせだけを、以降のすべての算出の元にする。
+   * 一覧・カテゴリーの選択肢・未読件数で母集団を揃え、
+   * 対象外のお知らせに既読が付かないようにする。
+   */
+  const forMe = useMemo(
+    () => announcements.filter((a) => isTargeted(a.targets, me.department)),
+    [announcements, me.department],
+  )
+
   const categories = useMemo(
-    () => Array.from(new Set(announcements.map((a) => a.category))),
-    [announcements],
+    () => Array.from(new Set(forMe.map((a) => a.category))),
+    [forMe],
   )
 
   const visible = useMemo(
     () =>
-      announcements.filter(
+      forMe.filter(
         (a) =>
           (category === ALL_CATEGORIES || a.category === category) &&
           matchesQuery(query, a.title, a.body, a.category, a.targets.join(' ')),
       ),
-    [announcements, category, query],
+    [forMe, category, query],
   )
 
   const unreadCount = useMemo(
-    () => announcements.filter((a) => !a.readUserIds.includes(me.id)).length,
-    [announcements, me.id],
+    () => forMe.filter((a) => !a.readUserIds.includes(me.id)).length,
+    [forMe, me.id],
   )
 
   return (

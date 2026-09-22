@@ -11,6 +11,8 @@ import { formatFullDateTime } from '@/lib/format'
 import { useChatStore } from '@/stores/chatStore'
 import { useDirectoryStore } from '@/stores/directoryStore'
 import { useHubStore } from '@/stores/hubStore'
+import { useCurrentUser } from '@/stores/sessionStore'
+import { hasRole } from '@/types'
 import { AdminPanel } from '@/features/admin/components/AdminPanel'
 import { StatCard } from '@/features/admin/components/StatCard'
 import { useUserLookup } from '@/features/admin/useUserLookup'
@@ -29,6 +31,14 @@ export function DashboardSection() {
   const safetyDrills = useHubStore((s) => s.safetyDrills)
   const auditLogs = useHubStore((s) => s.auditLogs)
   const lookup = useUserLookup()
+  const me = useCurrentUser()
+
+  /**
+   * 安否確認の集計は SafetySection と同じ DEPARTMENT_ADMIN 以上に揃える。
+   * ダッシュボードは GROUP_ADMIN から開けるため、ここで絞らないと
+   * 安否確認の画面は開けないのに回答率だけ見える状態になる。
+   */
+  const canSeeSafety = hasRole(me.role, 'DEPARTMENT_ADMIN')
 
   const activeStaff = useMemo(
     () => users.filter((u) => u.kind === 'human' && u.active).length,
@@ -92,15 +102,17 @@ export function DashboardSection() {
           hint={`受付 ${troubleStats.open} 件 / 対応中 ${troubleStats.inProgress} 件`}
           tone={troubleStats.total > 0 ? 'danger' : 'default'}
         />
-        <StatCard
-          icon={Siren}
-          label="安否確認の回答率"
-          value={`${rate}%`}
-          hint={drill ? `${drill.title}（${answered} / ${target} 名）` : '実施中の安否確認はありません'}
-          tone={rate >= 80 ? 'success' : 'warning'}
-        >
-          <Progress value={rate} className="h-2" aria-label="安否確認の回答率" />
-        </StatCard>
+        {canSeeSafety && (
+          <StatCard
+            icon={Siren}
+            label="安否確認の回答率"
+            value={`${rate}%`}
+            hint={drill ? `${drill.title}（${answered} / ${target} 名）` : '実施中の安否確認はありません'}
+            tone={rate >= 80 ? 'success' : 'warning'}
+          >
+            <Progress value={rate} className="h-2" aria-label="安否確認の回答率" />
+          </StatCard>
+        )}
       </div>
 
       <AdminPanel title="最近の動き" description="院内ハブ上で行われた直近の操作です。" padded={false}>

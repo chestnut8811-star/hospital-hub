@@ -15,6 +15,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { formatFullDateTime } from '@/lib/format'
+import { isTargeted } from '@/lib/targeting'
 import { useDirectoryStore } from '@/stores/directoryStore'
 import { useAnnouncements } from '@/stores/hubStore'
 import { AdminPanel } from '@/features/admin/components/AdminPanel'
@@ -25,11 +26,20 @@ export function AnnouncementsSection() {
 
   const staff = useMemo(() => users.filter((u) => u.kind === 'human'), [users])
 
-  /** 対象部署に所属する職員の数。['全職員'] なら名簿の全員。 */
-  const countTargets = (targets: string[]) =>
-    targets.includes('全職員')
-      ? staff.length
-      : staff.filter((u) => targets.includes(u.department)).length
+  /**
+   * 既読の「分子 / 分母」。
+   * 分母は配信対象の職員数、分子はそのうち既読になった人数。
+   * 分子を配信対象で絞らないと、対象外の職員の既読が混ざって
+   * 「15 / 10 名」のように分子が分母を超える。
+   */
+  const readStats = (targets: string[], readUserIds: string[]) => {
+    const targeted = staff.filter((u) => isTargeted(targets, u.department))
+    const targetedIds = new Set(targeted.map((u) => u.id))
+    return {
+      read: readUserIds.filter((id) => targetedIds.has(id)).length,
+      total: targeted.length,
+    }
+  }
 
   return (
     <AdminPanel
@@ -55,7 +65,7 @@ export function AnnouncementsSection() {
             </TableHeader>
             <TableBody>
               {announcements.map((a) => {
-                const total = countTargets(a.targets)
+                const { read, total } = readStats(a.targets, a.readUserIds)
                 return (
                   <TableRow key={a.id}>
                     <TableCell className="max-w-72 truncate pl-4 font-medium text-foreground">
@@ -74,7 +84,7 @@ export function AnnouncementsSection() {
                       {formatFullDateTime(a.publishedAt)}
                     </TableCell>
                     <TableCell className="text-right tabular-nums">
-                      {a.readUserIds.length} / {total} 名
+                      {read} / {total} 名
                     </TableCell>
                     <TableCell className="pr-4 text-right">
                       <Button asChild variant="outline" size="sm">

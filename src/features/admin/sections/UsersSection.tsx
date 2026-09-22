@@ -188,7 +188,7 @@ export function UsersSection() {
                       )}
                     </TableCell>
                     <TableCell>
-                      {canEdit ? (
+                      {canEdit && !isMe ? (
                         <span className="flex items-center gap-2">
                           <Switch
                             checked={user.active}
@@ -200,9 +200,16 @@ export function UsersSection() {
                           </span>
                         </span>
                       ) : (
-                        <Badge variant={user.active ? 'secondary' : 'outline'}>
-                          {user.active ? '在籍' : '在籍なし'}
-                        </Badge>
+                        <span className="flex items-center gap-1.5">
+                          <Badge variant={user.active ? 'secondary' : 'outline'}>
+                            {user.active ? '在籍' : '在籍なし'}
+                          </Badge>
+                          {canEdit && isMe && (
+                            <span className="text-xs text-muted-foreground">
+                              自分の在籍は変更できません
+                            </span>
+                          )}
+                        </span>
                       )}
                     </TableCell>
                     <TableCell className="pr-4 tabular-nums text-muted-foreground">

@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SurveyComposeDialog } from '@/features/surveys/SurveyComposeDialog'
 import { formatDateTime } from '@/lib/format'
+import { isTargeted } from '@/lib/targeting'
 import { useHubStore } from '@/stores/hubStore'
 import { useCurrentUser } from '@/stores/sessionStore'
 import type { Survey } from '@/types'
@@ -70,8 +71,17 @@ export function SurveyListPage() {
   const [tab, setTab] = useState('open')
   const [composeOpen, setComposeOpen] = useState(false)
 
-  const openSurveys = useMemo(() => surveys.filter((s) => s.status === 'open'), [surveys])
-  const closedSurveys = useMemo(() => surveys.filter((s) => s.status === 'closed'), [surveys])
+  /**
+   * 自分が配信対象のアンケートだけを扱う。
+   * 対象外のアンケートを開いて回答できてしまうと、集計の母数が崩れる。
+   */
+  const forMe = useMemo(
+    () => surveys.filter((s) => isTargeted(s.targets, me.department)),
+    [surveys, me.department],
+  )
+
+  const openSurveys = useMemo(() => forMe.filter((s) => s.status === 'open'), [forMe])
+  const closedSurveys = useMemo(() => forMe.filter((s) => s.status === 'closed'), [forMe])
 
   function answeredBy(survey: Survey) {
     return survey.responses.some((r) => r.userId === me.id)
