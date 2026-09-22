@@ -170,6 +170,11 @@ npm run dev      # 目視確認（375px / 768px / 1440px）
 - サブディレクトリ配信が必要になったら `vite.config.ts` の `base` と `createBrowserRouter` の
   `basename` を合わせて設定する。ハッシュルーター（`createHashRouter`）に替えればフォールバック不要
 - 外部通信はゼロ。フォント（Geist Variable）を含め依存はすべて `dist/assets/` に同梱される
+- `public/manifest.webmanifest` と 192/512/maskable/apple-touch のアイコンを同梱しており、
+  ホーム画面に追加すると全画面（`display: standalone`）で開く。
+  `start_url` と `scope` は `/` なので、サブディレクトリ配信にするときは base と合わせて書き換える
+- Service Worker は入れていない。オフライン起動とプッシュ通知は Phase 6 の範囲。
+  導入すると開発中にキャッシュが残って修正が反映されなくなるため、Phase 1 では意図的に見送る
 
 ## 11. 既知の割り切り（Phase 1）
 
