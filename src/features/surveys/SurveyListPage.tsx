@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SurveyComposeDialog } from '@/features/surveys/SurveyComposeDialog'
 import { formatDateTime } from '@/lib/format'
-import { isTargeted } from '@/lib/targeting'
+import { isVisibleToUser } from '@/lib/targeting'
 import { useHubStore } from '@/stores/hubStore'
 import { useCurrentUser } from '@/stores/sessionStore'
 import type { Survey } from '@/types'
@@ -72,12 +72,19 @@ export function SurveyListPage() {
   const [composeOpen, setComposeOpen] = useState(false)
 
   /**
-   * 自分が配信対象のアンケートだけを扱う。
+   * 自分が配信対象のアンケートと、自分が作成したアンケートを扱う。
    * 対象外のアンケートを開いて回答できてしまうと、集計の母数が崩れる。
+   * Survey の作成者は `createdBy` なので `authorId` に読み替えて渡す。
    */
   const forMe = useMemo(
-    () => surveys.filter((s) => isTargeted(s.targets, me.department)),
-    [surveys, me.department],
+    () =>
+      surveys.filter((s) =>
+        isVisibleToUser(
+          { targets: s.targets, authorId: s.createdBy },
+          { id: me.id, department: me.department },
+        ),
+      ),
+    [surveys, me.id, me.department],
   )
 
   const openSurveys = useMemo(() => forMe.filter((s) => s.status === 'open'), [forMe])

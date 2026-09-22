@@ -22,7 +22,7 @@ import {
 import { AnnouncementComposeDialog } from '@/features/announcements/AnnouncementComposeDialog'
 import { formatDateTime } from '@/lib/format'
 import { matchesQuery } from '@/lib/search'
-import { isTargeted } from '@/lib/targeting'
+import { isVisibleToUser } from '@/lib/targeting'
 import { cn } from '@/lib/utils'
 import { useAnnouncements } from '@/stores/hubStore'
 import { useCurrentUser } from '@/stores/sessionStore'
@@ -40,13 +40,17 @@ export function AnnouncementListPage() {
   const [composeOpen, setComposeOpen] = useState(false)
 
   /**
-   * 自分に配信されたお知らせだけを、以降のすべての算出の元にする。
+   * 自分に配信されたお知らせと、自分が配信したお知らせを、
+   * 以降のすべての算出の元にする。
    * 一覧・カテゴリーの選択肢・未読件数で母集団を揃え、
    * 対象外のお知らせに既読が付かないようにする。
    */
   const forMe = useMemo(
-    () => announcements.filter((a) => isTargeted(a.targets, me.department)),
-    [announcements, me.department],
+    () =>
+      announcements.filter((a) =>
+        isVisibleToUser(a, { id: me.id, department: me.department }),
+      ),
+    [announcements, me.id, me.department],
   )
 
   const categories = useMemo(

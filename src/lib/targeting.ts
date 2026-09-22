@@ -19,3 +19,17 @@ export function isTargeted(targets: string[], department: string | undefined): b
   if (targets.length === 0 || targets.includes(ALL_STAFF)) return true
   return department !== undefined && targets.includes(department)
 }
+
+/**
+ * 自分の一覧に出すかどうか。
+ *
+ * 配信対象に含まれていれば出す。加えて、自分が配信したものは
+ * 対象部署に自分が入っていなくても出す（配信した本人が自分の一覧で
+ * 見つけられないと、配信したこと自体を確認できないため）。
+ */
+export function isVisibleToUser(
+  item: { targets: string[]; authorId: string },
+  user: { id: string; department: string },
+): boolean {
+  return item.authorId === user.id || isTargeted(item.targets, user.department)
+}
