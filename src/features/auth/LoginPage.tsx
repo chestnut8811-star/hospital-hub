@@ -5,10 +5,11 @@
  * 「誰としてアプリを見るか」を選ぶための入口として作る。
  * 入力値の検証もしない（未入力のときだけボタンを無効にする）。
  */
-import { Eye, EyeOff, Hospital, IdCard, KeyRound, LogIn, ShieldCheck } from 'lucide-react'
+import { Eye, EyeOff, IdCard, KeyRound, LogIn, ShieldCheck } from 'lucide-react'
 import type { FormEvent } from 'react'
 import { useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
+import { BrandMark } from '@/components/common/BrandMark'
 import { DemoNotice } from '@/components/common/DemoNotice'
 import { UserAvatar } from '@/components/common/UserAvatar'
 import { Button } from '@/components/ui/button'
@@ -98,7 +99,7 @@ export function LoginPage() {
         {/* ロゴマーク */}
         <div className="mb-5 flex flex-col items-center gap-2 text-center">
           <span className="flex size-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-            <Hospital className="size-7" aria-hidden />
+            <BrandMark className="size-6" />
           </span>
           <h1 className="text-xl font-bold tracking-tight text-foreground">院内ハブ</h1>
           <p className="text-xs font-medium tracking-widest text-muted-foreground">

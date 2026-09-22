@@ -1,7 +1,8 @@
-import { Bell, Hospital, LogOut, RefreshCw, Search, Siren, UserCog } from 'lucide-react'
+import { Bell, LogOut, RefreshCw, Search, Siren, UserCog } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
+import { BrandMark } from '@/components/common/BrandMark'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { UnreadBadge } from '@/components/common/UnreadBadge'
 import { UserAvatar } from '@/components/common/UserAvatar'
@@ -81,7 +82,7 @@ export function AppHeader({ className }: { className?: string }) {
         className="flex min-w-0 items-center gap-2 rounded-lg py-1 pr-2 text-left"
       >
         <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <Hospital className="size-[18px]" aria-hidden />
+          <BrandMark className="size-[15px]" />
         </span>
         <span className="min-w-0">
           <span className="block truncate font-semibold leading-tight">院内ハブ</span>

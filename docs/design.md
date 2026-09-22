@@ -118,6 +118,10 @@ localStorage へのアクセスは必ず try/catch で保護されている（`s
 
 ## 6. 表示の決まり
 
+- シンボル（`components/common/BrandMark.tsx`）: 中心の正方形と上下左右の4つで十字を組む。
+  医療の十字であり、中心に集まるハブの図でもある。512 を16分割したグリッドで作図し、
+  正方形 112・すき間 16 に統一。効果・陰影・グラデーションは使わない。
+  アイコン類（favicon / 192 / 512 / maskable / apple-touch）はすべてこの形から起こす
 - 優先度: 緊急=`danger` / 重要=`warning` / 通常=`primary`。`components/common/PriorityBadge.tsx` を使う
 - **配色の AA 対応**: 元の設計書の Danger `#D64545` / Warning `#E89C31` / Success `#2F9E6F` / Sub text `#717784` は、
   白文字を載せる塗りや小さい文字では WCAG 2.1 AA（4.5:1）に届かない（4.38 / 3.89 / 3.36 / 4.19）。
