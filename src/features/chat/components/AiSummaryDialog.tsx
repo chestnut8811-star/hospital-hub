@@ -22,10 +22,12 @@ interface AiSummaryDialogProps {
   roomName: string
   messages: Message[]
   meId: string
+  /** ルームを開いた時点で未読だったメッセージのID */
+  unreadIds: readonly string[]
 }
 
 /**
- * AI要約モーダル（設計書 §13）。
+ * AI要約モーダル（設計指示 §13）。
  * バックエンドが無いため、実際のメッセージを分類して原文のまま並べ直すだけ。
  * 文章は創作しない。
  */
@@ -36,9 +38,13 @@ export function AiSummaryDialog({
   roomName,
   messages,
   meId,
+  unreadIds,
 }: AiSummaryDialogProps) {
   const sendMessage = useChatStore((s) => s.sendMessage)
-  const summary = useMemo(() => buildAiSummary(messages, meId), [messages, meId])
+  const summary = useMemo(
+    () => buildAiSummary(messages, meId, unreadIds),
+    [messages, meId, unreadIds],
+  )
 
   const asText = () =>
     summary.sections
@@ -56,7 +62,9 @@ export function AiSummaryDialog({
             AI で要約
           </DialogTitle>
           <DialogDescription>
-            {roomName}の{summary.targetCount} 件を整理しました。
+            {summary.fromUnread
+              ? `${roomName}の未読 ${summary.targetCount} 件を整理しました。`
+              : `${roomName}の直近 ${summary.targetCount} 件を整理しました（未読はありません）。`}
           </DialogDescription>
         </DialogHeader>
 
@@ -119,7 +127,7 @@ export function AiSummaryDialog({
             ルームに投稿
           </Button>
         </DialogFooter>
-        <p className="px-4 pb-4 text-[11px] text-muted-foreground">
+        <p className="px-4 pb-4 text-xs text-muted-foreground">
           <Bot className="mr-1 inline size-3" aria-hidden />
           投稿すると AI アシスタントの発言として表示されます。
         </p>

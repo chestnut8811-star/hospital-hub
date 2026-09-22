@@ -1,5 +1,5 @@
 /**
- * 安否確認（設計書 §16）。
+ * 安否確認（設計指示 §16）。
  *
  * 訓練であることを取り違えないよう、画面上部で必ず「訓練」と明示する。
  * 自分の回答 → 管理者向けの集計、の順に置く。
@@ -101,7 +101,13 @@ export function SafetyPage() {
               </div>
               <div className="rounded-lg bg-muted px-3 py-2">
                 <dt className="text-xs text-muted-foreground">参集</dt>
-                <dd className="font-medium">{myResponse.canCome ? '可能' : '困難'}</dd>
+                <dd className="font-medium">
+                  {myResponse.canCome === undefined
+                    ? '未回答'
+                    : myResponse.canCome
+                      ? '可能'
+                      : '困難'}
+                </dd>
               </div>
               <div className="rounded-lg bg-muted px-3 py-2">
                 <dt className="text-xs text-muted-foreground">回答日時</dt>

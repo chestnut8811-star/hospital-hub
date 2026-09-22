@@ -1,5 +1,5 @@
 /**
- * 管理画面のセクション定義（設計書 §19 §20）。
+ * 管理画面のセクション定義（設計指示 §19 §20）。
  *
  * ここだけで「どの権限にどのセクションを見せるか」を決める。
  * サブナビと本文の出し分けは同じ定義を使うので、導線と中身がずれない。
@@ -17,6 +17,7 @@ import {
   Users,
 } from 'lucide-react'
 import type { Role } from '@/types'
+import { ROLE_RANK } from '@/types'
 
 export type AdminSectionId =
   | 'dashboard'
@@ -112,3 +113,12 @@ export const ADMIN_SECTIONS: AdminSectionDef[] = [
 export function findAdminSection(id: string | undefined): AdminSectionDef | undefined {
   return ADMIN_SECTIONS.find((s) => s.id === (id ?? DEFAULT_ADMIN_SECTION))
 }
+
+/**
+ * 管理画面に入れる最低権限。ADMIN_SECTIONS の最小値から導くので、
+ * セクションの権限を変えても入口と中身がずれない。
+ */
+export const ADMIN_ENTRY_ROLE: Role = ADMIN_SECTIONS.reduce<Role>(
+  (min, section) => (ROLE_RANK[section.minRole] < ROLE_RANK[min] ? section.minRole : min),
+  'SYSTEM_ADMIN',
+)

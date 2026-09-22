@@ -1,5 +1,5 @@
 /**
- * AI アシスタントのモック応答（設計書 §13）。
+ * AI アシスタントのモック応答（設計指示 §13）。
  *
  * バックエンドが無いため、応答は「院内ナレッジのどの記事に書かれているか」の案内に限定する。
  * 手順・設定値・臨床判断を AI が文章として生成することは絶対にしない。
@@ -26,7 +26,8 @@ export interface AiAnswer {
  */
 function findRelatedDocs(question: string, knowledge: KnowledgeDoc[]): KnowledgeDoc[] {
   const q = normalize(question)
-  if (!q) return []
+  // 1文字だと何にでも部分一致してしまうので、関連記事として扱わない
+  if (q.length < 2) return []
 
   return knowledge
     .map((doc) => {
@@ -60,7 +61,9 @@ export function buildAnswer(question: string, knowledge: KnowledgeDoc[]): AiAnsw
     }
   }
   return {
-    text: `院内ナレッジに関連する記事が ${docs.length} 件ありました。内容は次の記事に書かれています。`,
+    // 「書かれています」と断定すると、臨床の設定値を尋ねた人が
+    // 「この記事に載っている」と誤解しうる。あくまで候補の提示にとどめる。
+    text: `ご質問に関連しそうな記事が院内ナレッジに ${docs.length} 件ありました。内容が合っているかは記事を開いて確認してください。`,
     docs,
   }
 }

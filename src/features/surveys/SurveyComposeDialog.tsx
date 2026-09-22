@@ -5,6 +5,7 @@
 import { Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -42,6 +43,8 @@ export function SurveyComposeDialog({ open, onOpenChange }: SurveyComposeDialogP
   const [allStaff, setAllStaff] = useState(true)
   const [targets, setTargets] = useState<string[]>([])
   const [questions, setQuestions] = useState<SurveyQuestion[]>([])
+  const [closesAt, setClosesAt] = useState('')
+  const [confirmOpen, setConfirmOpen] = useState(false)
 
   const chosenTargets = allStaff ? [ALL_STAFF] : targets
   const canSubmit =
@@ -54,6 +57,7 @@ export function SurveyComposeDialog({ open, onOpenChange }: SurveyComposeDialogP
     setAllStaff(true)
     setTargets([])
     setQuestions([])
+    setClosesAt('')
   }
 
   function submit() {
@@ -63,6 +67,8 @@ export function SurveyComposeDialog({ open, onOpenChange }: SurveyComposeDialogP
       targets: chosenTargets,
       anonymous,
       questions,
+      // 日付だけ選ばせて、締め切りはその日の17:00 とする
+      ...(closesAt ? { closesAt: new Date(`${closesAt}T17:00:00`).toISOString() } : {}),
     })
     toast.success('アンケートを作成しました')
     reset()
@@ -191,18 +197,54 @@ export function SurveyComposeDialog({ open, onOpenChange }: SurveyComposeDialogP
             )}
           </div>
 
+          <div className="space-y-1.5">
+            <Label htmlFor="survey-closes">締め切り（任意）</Label>
+            <Input
+              id="survey-closes"
+              type="date"
+              value={closesAt}
+              onChange={(e) => setClosesAt(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              指定した日の 17:00 を締め切りとして表示します。
+            </p>
+          </div>
+
           <SurveyQuestionBuilder onAdd={(question) => setQuestions((prev) => [...prev, question])} />
         </div>
 
         <DialogFooter className="gap-2 sm:gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              reset()
+              onOpenChange(false)
+            }}
+          >
             キャンセル
           </Button>
-          <Button disabled={!canSubmit} onClick={submit}>
+          <Button disabled={!canSubmit} onClick={() => setConfirmOpen(true)}>
             作成する
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="このアンケートを作成しますか？"
+        description={
+          <span>
+            対象：{chosenTargets.join('・')}
+            <br />
+            質問 {questions.length} 問{anonymous ? '・匿名' : ''}
+            <br />
+            作成後に取り消す機能はありません（締め切りへの変更は管理画面からできます）。
+          </span>
+        }
+        confirmLabel="作成する"
+        onConfirm={submit}
+      />
     </Dialog>
   )
 }

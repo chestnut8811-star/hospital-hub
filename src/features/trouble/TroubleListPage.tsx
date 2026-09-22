@@ -1,5 +1,5 @@
 /**
- * 機器トラブル報告の一覧（設計書 §18）。
+ * 機器トラブル報告の一覧（設計指示 §18）。
  * 「困っている人がすぐ報告できる」ことを最優先に、新規報告ボタンを先頭に置く。
  */
 import { Plus, Search, SearchX, X } from 'lucide-react'
@@ -26,11 +26,11 @@ export function TroubleListPage() {
   const [query, setQuery] = useState('')
   const [tab, setTab] = useState<TabValue>('all')
 
-  // 検索対象：機器名・管理番号・場所・症状
+  // 検索対象：報告番号・機器名・管理番号・場所・症状・カテゴリー
   const hits = useMemo(
     () =>
       troubles.filter((t) =>
-        matchesQuery(query, t.deviceName, t.assetNo, t.location, t.symptom, t.category),
+        matchesQuery(query, t.id, t.deviceName, t.assetNo, t.location, t.symptom, t.category),
       ),
     [troubles, query],
   )

@@ -9,6 +9,7 @@ import { useMemo } from 'react'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { todayKey } from '@/lib/demoDay'
+import { SEED_REVISION } from '@/mock/seed'
 import { uid } from '@/lib/id'
 import { safeStorage } from '@/lib/storage'
 import { repository } from '@/repositories/hubRepository'
@@ -51,6 +52,7 @@ export interface CreateGroupInput {
 
 interface ChatState {
   seededOn: string
+  seedRevision: number
   rooms: Room[]
   messages: Message[]
   notes: SharedNote[]
@@ -64,6 +66,8 @@ interface ChatState {
   createGroup: (input: CreateGroupInput) => string
   updateGroup: (roomId: string, patch: Partial<Pick<Room, 'name' | 'icon' | 'accent' | 'description' | 'memberIds' | 'adminIds'>>) => void
   createDirectRoom: (userId: string) => string
+  /** 自分のマイルームを返す。無ければ作る（利用者を切り替えたとき用） */
+  ensureMyRoom: () => string
 
   toggleReaction: (messageId: string, emoji: string) => void
   editMessage: (messageId: string, body: string) => void
@@ -103,12 +107,14 @@ export const useChatStore = create<ChatState>()(
   persist(
     (set, get) => ({
       seededOn: todayKey(),
+      seedRevision: SEED_REVISION,
       rooms: seed.rooms,
       messages: seed.messages,
       notes: seed.notes,
 
       sendMessage: (roomId, input) => {
-        const me = input.senderId ?? currentUserId()
+        const viewer = currentUserId()
+        const me = input.senderId ?? viewer
         const id = uid('m')
         const message: Message = {
           id,
@@ -117,7 +123,8 @@ export const useChatStore = create<ChatState>()(
           type: input.type ?? 'text',
           body: input.body,
           createdAt: new Date().toISOString(),
-          readUserIds: [me],
+          // AI要約の投稿など送信者が自分以外でも、操作した本人には未読を付けない
+          readUserIds: Array.from(new Set([me, viewer])),
           ...(input.title ? { title: input.title } : {}),
           ...(input.priority ? { priority: input.priority } : {}),
           ...(input.attachments ? { attachments: input.attachments } : {}),
@@ -194,6 +201,31 @@ export const useChatStore = create<ChatState>()(
 
       updateGroup: (roomId, patch) =>
         set((s) => ({ rooms: s.rooms.map((r) => (r.id === roomId ? { ...r, ...patch } : r)) })),
+
+      ensureMyRoom: () => {
+        const me = currentUserId()
+        const existing = get().rooms.find((r) => r.kind === 'myroom' && r.memberIds.includes(me))
+        if (existing) return existing.id
+        const id = uid('room')
+        const room: Room = {
+          id,
+          kind: 'myroom',
+          name: 'マイルーム',
+          icon: '📝',
+          accent: '#3157b7',
+          description: '自分だけが見られるメモ・TODO・ファイル置き場',
+          memberIds: [me],
+          adminIds: [me],
+          pinned: false,
+          muted: false,
+          hidden: false,
+          unreadCount: 0,
+          hasEmergency: false,
+          createdAt: new Date().toISOString(),
+        }
+        set((s) => ({ rooms: [...s.rooms, room] }))
+        return id
+      },
 
       createDirectRoom: (userId) => {
         const me = currentUserId()
@@ -357,6 +389,7 @@ export const useChatStore = create<ChatState>()(
         const fresh = repository.loadSeed(currentUserId())
         set({
           seededOn: todayKey(),
+          seedRevision: SEED_REVISION,
           rooms: fresh.rooms,
           messages: fresh.messages,
           notes: fresh.notes,
@@ -366,15 +399,21 @@ export const useChatStore = create<ChatState>()(
     {
       name: 'hch.chat.v1',
       storage: createJSONStorage(() => safeStorage),
+      // 保存データの形を変えたらここを上げる。migrate を置かないので古い保存分は捨てられる
+      version: 1,
+      // 版が変わったら保存分は捨てる（そのための merge があるので復元はしない）
+      migrate: () => undefined as never,
       partialize: (s) => ({
         seededOn: s.seededOn,
+        seedRevision: s.seedRevision,
         rooms: s.rooms,
         messages: s.messages,
         notes: s.notes,
       }),
       merge: (persisted, current) => {
         const p = persisted as Partial<ChatState> | undefined
-        if (!p || p.seededOn !== todayKey()) return current
+        // 日付が変わった／モックの版が上がったときは保存分を捨てて作り直す
+        if (!p || p.seededOn !== todayKey() || p.seedRevision !== SEED_REVISION) return current
         return { ...current, ...p }
       },
     },
@@ -391,6 +430,7 @@ export function useRoom(roomId: string | undefined): Room | undefined {
 export function useRoomList(kind: RoomKind): Room[] {
   const rooms = useChatStore((s) => s.rooms)
   const messages = useChatStore((s) => s.messages)
+  const meId = currentUserId()
   return useMemo(() => {
     const lastAt = new Map<string, string>()
     for (const m of messages) {
@@ -398,18 +438,22 @@ export function useRoomList(kind: RoomKind): Room[] {
       if (!prev || m.createdAt > prev) lastAt.set(m.roomId, m.createdAt)
     }
     return rooms
-      .filter((r) => r.kind === kind && !r.hidden)
+      .filter((r) => r.kind === kind && !r.hidden && r.memberIds.includes(meId))
       .sort((a, b) => {
         if (a.pinned !== b.pinned) return a.pinned ? -1 : 1
         return (lastAt.get(b.id) ?? b.createdAt).localeCompare(lastAt.get(a.id) ?? a.createdAt)
       })
-  }, [rooms, messages, kind])
+  }, [rooms, messages, kind, meId])
 }
 
 /** 非表示にしたルーム（復帰用） */
 export function useHiddenRooms(kind: RoomKind): Room[] {
   const rooms = useChatStore((s) => s.rooms)
-  return useMemo(() => rooms.filter((r) => r.kind === kind && r.hidden), [rooms, kind])
+  const meId = currentUserId()
+  return useMemo(
+    () => rooms.filter((r) => r.kind === kind && r.hidden && r.memberIds.includes(meId)),
+    [rooms, kind, meId],
+  )
 }
 
 export function useRoomMessages(roomId: string | undefined): Message[] {
@@ -448,7 +492,10 @@ export function useTotalUnread(kind: RoomKind): number {
   return useMemo(
     () =>
       rooms
-        .filter((r) => r.kind === kind && !r.hidden && !r.muted)
+        .filter(
+          (r) =>
+            r.kind === kind && !r.hidden && !r.muted && r.memberIds.includes(currentUserId()),
+        )
         .reduce((sum, r) => sum + r.unreadCount, 0),
     [rooms, kind],
   )

@@ -10,7 +10,7 @@ import { useChatStore } from '@/stores/chatStore'
 import { useSessionStore } from '@/stores/sessionStore'
 
 /**
- * 画面の骨組み（設計書 §5）。
+ * 画面の骨組み（設計指示 §5）。
  * - スマホ: ヘッダー(56px) + 本文 + 下部ナビ(64px)
  * - PC:     サイドバー(280px) + ヘッダー + 本文
  * チャット画面はスマホで全画面にしたいので、ルートの handle で共通部分を隠す。

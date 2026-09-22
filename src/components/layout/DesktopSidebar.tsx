@@ -19,7 +19,7 @@ export function DesktopSidebar({ className }: { className?: string }) {
   const me = useCurrentUser()
   const groupUnread = useTotalUnread('group')
   const directUnread = useTotalUnread('direct')
-  const announcements = useUnreadAnnouncementCount(me.id)
+  const announcements = useUnreadAnnouncementCount(me.id, me.department)
   const troubles = useOpenTroubleCount()
   const surveys = useOpenSurveyCount()
   const drill = useActiveDrill()

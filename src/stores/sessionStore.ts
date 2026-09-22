@@ -22,12 +22,16 @@ export const useSessionStore = create<SessionState>()(
       currentUserId: DEFAULT_USER_ID,
       isAuthenticated: false,
       login: (userId) => set({ currentUserId: userId, isAuthenticated: true }),
-      logout: () => set({ isAuthenticated: false }),
+      // 利用者も既定に戻す（次のログイン画面に前の人が残らないように）
+      logout: () => set({ isAuthenticated: false, currentUserId: DEFAULT_USER_ID }),
       switchUser: (userId) => set({ currentUserId: userId }),
     }),
     {
       name: 'hch.session.v1',
       storage: createJSONStorage(() => safeStorage),
+      // 保存データの形を変えたらここを上げる。migrate を置かないので古い保存分は捨てられる
+      version: 1,
+      migrate: () => undefined as never,
     },
   ),
 )

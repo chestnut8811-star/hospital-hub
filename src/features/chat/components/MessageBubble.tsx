@@ -17,6 +17,7 @@ import { useLongPress } from '@/features/chat/hooks/useLongPress'
 import { useChatStore } from '@/stores/chatStore'
 import { getUser } from '@/stores/directoryStore'
 import type { Message, Room } from '@/types'
+import { AI_USER_ID, SYSTEM_USER_ID } from '@/types'
 
 interface MessageBubbleProps {
   message: Message
@@ -33,12 +34,27 @@ interface MessageBubbleProps {
 
 export function MessageBubble(props: MessageBubbleProps) {
   const { message, room, meId } = props
-  if (message.type === 'system') return <SystemLine message={message} />
-  if (message.type === 'ai') return <AiBubble {...props} />
+  // 削除済みは種別によらず同じ表示にする（重要カードやAI吹き出しが中身だけ空で残らないように）
+  if (message.deleted) return <DeletedBubble isMine={message.senderId === meId} />
+  if (message.type === 'system' || message.senderId === SYSTEM_USER_ID) {
+    return <SystemLine message={message} />
+  }
+  // AI かどうかは senderId で判定する（type だけだと人間の吹き出し色に落ちうる）
+  if (message.senderId === AI_USER_ID || message.type === 'ai') return <AiBubble {...props} />
   if (message.priority === 'emergency' || message.priority === 'important') {
     return <ImportantCard {...props} total={room.memberIds.length} />
   }
   return <NormalBubble {...props} isMine={message.senderId === meId} />
+}
+
+function DeletedBubble({ isMine }: { isMine: boolean }) {
+  return (
+    <div className={cn('flex px-3 py-0.5 lg:px-4', isMine ? 'justify-end' : 'justify-start')}>
+      <p className="rounded-msg border border-dashed border-border px-3 py-2 text-sm text-muted-foreground">
+        メッセージは削除されました
+      </p>
+    </div>
+  )
 }
 
 /**
@@ -94,9 +110,14 @@ function ReactionRow({ message, meId }: { message: Message; meId: string }) {
   )
 }
 
-function ReplyQuote({ replyTo }: { replyTo: Message }) {
+function ReplyQuote({ replyTo, isMine }: { replyTo: Message; isMine?: boolean }) {
   return (
-    <p className="mb-1.5 flex items-start gap-1.5 border-l-2 border-border pl-2 text-xs text-muted-foreground">
+    <p
+      className={cn(
+        'mb-1.5 flex items-start gap-1.5 border-l-2 border-border pl-2 text-xs',
+        isMine ? 'text-bubble-me-muted' : 'text-muted-foreground',
+      )}
+    >
       <Reply className="mt-0.5 size-3 shrink-0" aria-hidden />
       <span className="min-w-0">
         <span className="font-medium">{getUser(replyTo.senderId).name}</span>：
@@ -122,7 +143,7 @@ function MetaLine({
   return (
     <p
       className={cn(
-        'mt-0.5 flex items-center gap-1.5 text-[11px] text-muted-foreground',
+        'mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground',
         align === 'right' ? 'justify-end' : 'justify-start',
       )}
     >
@@ -152,16 +173,6 @@ function NormalBubble({
   const [menuOpen, setMenuOpen] = useState(false)
   const longPress = useLongPress(() => setMenuOpen(true))
   const sender = getUser(message.senderId)
-
-  if (message.deleted) {
-    return (
-      <div className={cn('flex px-3 py-0.5', isMine ? 'justify-end' : 'justify-start')}>
-        <p className="rounded-msg border border-dashed border-border px-3 py-2 text-sm text-muted-foreground">
-          メッセージは削除されました
-        </p>
-      </div>
-    )
-  }
 
   return (
     <div
@@ -212,7 +223,7 @@ function NormalBubble({
                 : 'border border-border bg-card text-card-foreground',
             )}
           >
-            {replyTo && <ReplyQuote replyTo={replyTo} />}
+            {replyTo && <ReplyQuote replyTo={replyTo} isMine={isMine} />}
             {message.title && <p className="mb-1 font-semibold">{message.title}</p>}
             {message.body && (
               <p className="break-words whitespace-pre-wrap">
@@ -257,12 +268,12 @@ function AiBubble({ message, meId, query }: MessageBubbleProps) {
           <p className="break-words whitespace-pre-wrap">
             <Highlight text={message.body} query={query} />
           </p>
-          <p className="mt-2 border-t border-ai-border pt-1.5 text-[11px] text-muted-foreground">
+          <p className="mt-2 border-t border-ai-border pt-1.5 text-xs text-muted-foreground">
             AI が生成した要約です。内容は必ず原文で確認してください。
           </p>
         </div>
         <ReactionRow message={message} meId={meId} />
-        <p className="mt-0.5 text-[11px] text-muted-foreground">
+        <p className="mt-0.5 text-xs text-muted-foreground">
           <time dateTime={message.createdAt}>{formatBubbleTime(message.createdAt)}</time>
         </p>
       </div>

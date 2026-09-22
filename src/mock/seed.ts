@@ -34,6 +34,13 @@ import type {
 /** JSON に書かれている基準日 */
 const ANCHOR_DATE = '2026-09-22'
 
+/**
+ * モックデータやストアの形を変えたら上げる。
+ * 保存済みのデータがこれと違えば捨てて作り直すので、
+ * 「同じ日に配り直した修正版で、古い保存データが勝つ」事故を防げる。
+ */
+export const SEED_REVISION = 2
+
 const ISO_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/
 
 function startOfLocalDay(date: Date): Date {
@@ -111,14 +118,15 @@ export function createSeed(viewerId: string = DEFAULT_USER_ID): SeedData {
   const rooms = rebase(roomsJson as unknown as Room[], delta)
   return {
     users: rebase(usersJson as unknown as User[], delta),
-    departments: departmentsJson as unknown as Department[],
+    // 3つのストアから呼ばれるので、JSON の参照をそのまま渡さない（共有されてしまう）
+    departments: rebase(departmentsJson as unknown as Department[], delta),
     rooms: withDerivedRoomState(rooms, messages, viewerId),
     messages,
     notes: rebase(notesJson as unknown as SharedNote[], delta),
     announcements: rebase(announcementsJson as unknown as Announcement[], delta),
     knowledge: rebase(knowledgeJson as unknown as KnowledgeDoc[], delta),
     troubles: rebase(troublesJson as unknown as TroubleReport[], delta),
-    troubleOptions: troubleOptionsJson,
+    troubleOptions: rebase(troubleOptionsJson, delta),
     safetyDrills: rebase(safetyJson as unknown as SafetyDrill[], delta),
     surveys: rebase(surveysJson as unknown as Survey[], delta),
     auditLogs: rebase(auditLogsJson as unknown as AuditLog[], delta),

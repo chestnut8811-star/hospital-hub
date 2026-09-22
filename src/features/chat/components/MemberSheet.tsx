@@ -40,7 +40,7 @@ export function MemberSheet({ room, meId, onOpenChange }: MemberSheetProps) {
                     {user.name}
                     {id === meId && <span className="ml-1 text-xs text-muted-foreground">（自分）</span>}
                     {isAdmin && (
-                      <span className="ml-1.5 rounded-md bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-secondary-foreground">
+                      <span className="ml-1.5 rounded-md bg-secondary px-1.5 py-0.5 text-xs font-medium text-secondary-foreground">
                         管理者
                       </span>
                     )}

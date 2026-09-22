@@ -6,11 +6,16 @@ import { MessageBubble } from '@/features/chat/components/MessageBubble'
 import type { Message, Room } from '@/types'
 
 interface MessageListProps {
+  /** 表示するメッセージ（検索中は絞り込み後） */
   messages: Message[]
+  /** 返信元をたどるための全メッセージ（検索中でも引用が消えないように） */
+  allMessages: Message[]
   room: Room
   meId: string
   canModerate: boolean
   query: string
+  /** 最下部への自動スクロールを行うか（ルーム内検索中は行わない） */
+  autoScroll: boolean
   onReply: (message: Message) => void
   onEdit: (message: Message) => void
 }
@@ -20,15 +25,17 @@ const GROUP_WINDOW_MS = 5 * 60 * 1000
 
 export function MessageList({
   messages,
+  allMessages,
   room,
   meId,
   canModerate,
   query,
+  autoScroll,
   onReply,
   onEdit,
 }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null)
-  const byId = useMemo(() => new Map(messages.map((m) => [m.id, m])), [messages])
+  const byId = useMemo(() => new Map(allMessages.map((m) => [m.id, m])), [allMessages])
 
   const rows = useMemo(() => {
     const sorted = [...messages].sort((a, b) => a.createdAt.localeCompare(b.createdAt))
@@ -47,10 +54,13 @@ export function MessageList({
     })
   }, [messages])
 
-  // 新しい発言が増えたら最下部まで送る
+  // 最後のメッセージが変わったときだけ最下部へ送る。
+  // 件数で判定すると、ルーム内検索で絞り込むたびに飛んでしまう。
+  const lastId = rows.length > 0 ? rows[rows.length - 1].message.id : null
   useEffect(() => {
+    if (!autoScroll) return
     bottomRef.current?.scrollIntoView({ block: 'end' })
-  }, [messages.length])
+  }, [lastId, autoScroll])
 
   if (rows.length === 0) {
     return (

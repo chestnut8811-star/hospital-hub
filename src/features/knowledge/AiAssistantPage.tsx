@@ -1,5 +1,5 @@
 /**
- * AI アシスタント（設計書 §13）。
+ * AI アシスタント（設計指示 §13）。
  *
  * バックエンドが無いためモック応答。AI が臨床内容を創作したように見えないよう、
  * 応答は院内ナレッジ記事への案内だけに限定し、AI の発言は人間と必ず見分けがつく形にする。
@@ -51,11 +51,15 @@ export function AiAssistantPage() {
   const [thinking, setThinking] = useState<string | null>(null)
 
   const scrollRef = useRef<HTMLDivElement>(null)
+  /** ask() から参照するための「考え中」の最新値 */
+  const thinkingRef = useRef<string | null>(null)
   const autoAskedRef = useRef(false)
 
   const ask = useCallback((question: string) => {
     const text = question.trim()
     if (!text) return
+    // 「考え中…」の最中に次を送ると、先の質問の回答がタイマー解除で消えてしまう
+    if (thinkingRef.current !== null) return
     setTurns((prev) => [
       ...prev,
       { id: uid('q'), role: 'user', at: new Date().toISOString(), text },
@@ -93,11 +97,15 @@ export function AiAssistantPage() {
     if (el) el.scrollTop = el.scrollHeight
   }, [turns, thinking])
 
+  useEffect(() => {
+    thinkingRef.current = thinking
+  }, [thinking])
+
   const canSend = useMemo(() => input.trim().length > 0 && thinking === null, [input, thinking])
 
   return (
     <div className="flex h-full flex-col">
-      <PageHeader title="AI アシスタント" description="院内ナレッジへの案内" />
+      <PageHeader title="AI アシスタント" description="院内ナレッジへの案内" backTo="/menu" />
 
       {/* 画面上部に固定で出す注意帯 */}
       <div className="shrink-0 border-b border-ai-border bg-ai-soft px-4 py-2">
@@ -141,7 +149,7 @@ export function AiAssistantPage() {
           {turns.map((turn) =>
             turn.role === 'user' ? (
               <div key={turn.id} className="flex items-end justify-end gap-2">
-                <span className="mb-1 shrink-0 text-[11px] text-muted-foreground">
+                <span className="mb-1 shrink-0 text-xs text-muted-foreground">
                   {formatBubbleTime(turn.at)}
                 </span>
                 <div className="max-w-[80%] rounded-msg bg-bubble-me px-3 py-2 text-[15px] leading-relaxed text-bubble-me-foreground">
@@ -153,7 +161,7 @@ export function AiAssistantPage() {
               <div key={turn.id} className="flex items-start gap-2">
                 <UserAvatar user={aiUser} size="sm" />
                 <div className="min-w-0 max-w-[85%]">
-                  <p className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-ai">
+                  <p className="mb-0.5 flex items-center gap-1.5 text-xs font-semibold text-ai">
                     AI アシスタント
                     <span className="font-normal text-muted-foreground">
                       {formatBubbleTime(turn.at)}
@@ -177,7 +185,7 @@ export function AiAssistantPage() {
                               <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                                 {doc.summary}
                               </p>
-                              <p className="mt-1.5 text-[11px] text-muted-foreground">
+                              <p className="mt-1.5 text-xs text-muted-foreground">
                                 出典：{doc.source}
                               </p>
                             </Link>
@@ -198,7 +206,7 @@ export function AiAssistantPage() {
             <div className="flex items-start gap-2">
               <UserAvatar user={aiUser} size="sm" />
               <div>
-                <p className="mb-0.5 text-[11px] font-semibold text-ai">AI アシスタント</p>
+                <p className="mb-0.5 text-xs font-semibold text-ai">AI アシスタント</p>
                 <div
                   className="rounded-msg border border-ai-border bg-ai-soft px-3 py-2.5 text-[15px] text-muted-foreground"
                   aria-live="polite"

@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
+import { DemoNotice } from '@/components/common/DemoNotice'
 import { EmptyState } from '@/components/common/EmptyState'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,7 +19,7 @@ import { getUser } from '@/stores/directoryStore'
 
 type TabKey = 'note' | 'files' | 'images'
 
-/** 共有ノート・ファイル・画像（設計書 §12） */
+/** 共有ノート・ファイル・画像（設計指示 §12） */
 export function NotePage() {
   const { roomId } = useParams()
   const navigate = useNavigate()
@@ -28,7 +29,12 @@ export function NotePage() {
   const messages = useRoomMessages(roomId)
   const saveNote = useChatStore((s) => s.saveNote)
 
-  const tab = (params.get('tab') as TabKey) ?? 'note'
+  const requestedTab = params.get('tab')
+  // 未知の値が来ても本文が空にならないようにノートへ落とす
+  const tab: TabKey =
+    requestedTab === 'files' || requestedTab === 'images' || requestedTab === 'note'
+      ? requestedTab
+      : 'note'
   const [editing, setEditing] = useState(false)
   const [baseVersion, setBaseVersion] = useState(0)
   const [title, setTitle] = useState('')
@@ -83,7 +89,7 @@ export function NotePage() {
   }
 
   const trySave = () => {
-    // 同時編集による上書きを防ぐ（設計書 §12）
+    // 同時編集による上書きを防ぐ（設計指示 §12）
     if (note && note.version !== baseVersion) setConflictOpen(true)
     else commit()
   }
@@ -105,6 +111,8 @@ export function NotePage() {
       />
 
       <div className="mx-auto w-full max-w-3xl px-4 py-4">
+        <DemoNotice className="mb-4" />
+
         <Tabs
           value={tab}
           onValueChange={(value) => setParams(value === 'note' ? {} : { tab: value })}

@@ -8,7 +8,7 @@
 import { Eye, EyeOff, Hospital, IdCard, KeyRound, LogIn, ShieldCheck } from 'lucide-react'
 import type { FormEvent } from 'react'
 import { useState } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { DemoNotice } from '@/components/common/DemoNotice'
 import { UserAvatar } from '@/components/common/UserAvatar'
 import { Button } from '@/components/ui/button'
@@ -30,7 +30,7 @@ const ROLE_GROUPS: { role: Role; summary: string }[] = [
   },
   {
     role: 'GROUP_ADMIN',
-    summary: '＋ グループの作成とメンバー管理、管理画面のダッシュボード',
+    summary: '＋ グループの作成、重要メッセージ化、管理画面のダッシュボード',
   },
   {
     role: 'DEPARTMENT_ADMIN',
@@ -46,7 +46,6 @@ export function LoginPage() {
   const isAuthenticated = useSessionStore((s) => s.isAuthenticated)
   const login = useSessionStore((s) => s.login)
   const staff = useStaff()
-  const navigate = useNavigate()
   const location = useLocation()
 
   const [staffId, setStaffId] = useState('')
@@ -57,10 +56,13 @@ export function LoginPage() {
   const from = (location.state as { from?: string } | null)?.from
   const destination = from && from !== '/login' ? from : '/groups'
 
-  /** 選んだ職員としてログインし、元いた画面（無ければグループ一覧）へ進む */
+  /**
+   * 選んだ職員としてログインする。
+   * 遷移は下の <Navigate to={destination}> に任せる
+   * （ここで navigate も呼ぶと、再描画で走る <Navigate> と競合して行き先が上書きされる）。
+   */
   const signInAs = (userId: string) => {
     login(userId)
-    navigate(destination, { replace: true })
   }
 
   /**
@@ -81,7 +83,7 @@ export function LoginPage() {
   }
 
   // すでにログイン済みならログイン画面には留まらない
-  if (isAuthenticated) return <Navigate to="/groups" replace />
+  if (isAuthenticated) return <Navigate to={destination} replace />
 
   const hero = staff.find((u) => u.id === DEFAULT_USER_ID)
   // 主人公は上段で目立たせるので、権限ごとの一覧からは外す
@@ -249,7 +251,7 @@ function StaffButton({ user, featured, onSelect }: StaffButtonProps) {
         <span className="flex items-center gap-2">
           <span className="truncate text-sm font-semibold text-foreground">{user.name}</span>
           {!user.active && (
-            <span className="shrink-0 rounded-md bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
+            <span className="shrink-0 rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
               在籍なし
             </span>
           )}

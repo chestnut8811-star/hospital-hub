@@ -77,7 +77,7 @@ export function RoomListPane({ kind, title, activeRoomId, className }: RoomListP
             </button>
           )}
         </div>
-        <p className="mt-1.5 text-[11px] text-muted-foreground">
+        <p className="mt-1.5 text-xs text-muted-foreground">
           長押し（PC は右クリック）でピン留め・通知オフ・非表示
         </p>
       </div>

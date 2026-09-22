@@ -1,5 +1,5 @@
 /**
- * 機器トラブルの新規報告（設計書 §18）。
+ * 機器トラブルの新規報告（設計指示 §18）。
  * 送信すると報告が作られ、「医療機器トラブル」グループへ自動投稿される。
  */
 import { Camera, Phone, Send, Siren, Users } from 'lucide-react'
@@ -31,7 +31,7 @@ const SEVERITIES: TroubleSeverity[] = ['high', 'medium', 'low']
 /** 必須項目の見出しに添える印 */
 function RequiredMark() {
   return (
-    <span className="rounded bg-danger-soft px-1.5 py-0.5 text-[11px] font-semibold text-danger">
+    <span className="rounded bg-danger-soft px-1.5 py-0.5 text-xs font-semibold text-danger">
       必須
     </span>
   )

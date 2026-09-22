@@ -29,7 +29,7 @@ interface RoomListItemProps {
   onShowMembers: (room: Room) => void
 }
 
-/** チャット一覧の1行。長押し／右クリック／⋯ で操作メニューが開く（設計書 §5） */
+/** チャット一覧の1行。長押し／右クリック／⋯ で操作メニューが開く（設計指示 §5） */
 export function RoomListItem({ room, meId, query, active, onShowMembers }: RoomListItemProps) {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -51,6 +51,8 @@ export function RoomListItem({ room, meId, query, active, onShowMembers }: RoomL
               ? `📎 ${last.attachments?.[0]?.name ?? 'ファイル'}`
               : last.type === 'form'
                 ? '📊 アンケート'
+                : last.type === 'url'
+                  ? `🔗 ${last.link?.title ?? 'リンク'}`
                 : truncate(last.title ? `${last.title} ${last.body}` : last.body, 48)
         }`
     : 'まだメッセージはありません'
@@ -108,7 +110,9 @@ export function RoomListItem({ room, meId, query, active, onShowMembers }: RoomL
           <Button
             variant="ghost"
             size="icon-sm"
-            className="absolute top-1/2 right-1 -translate-y-1/2 opacity-0 focus-visible:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100"
+            // タッチ端末には hover が無いため、見えていないときは当たり判定も消す
+            // （見えないボタンが時刻・未読バッジを覆ってしまう）
+            className="pointer-events-none absolute top-1/2 right-1 -translate-y-1/2 opacity-0 focus-visible:pointer-events-auto focus-visible:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100 data-[state=open]:pointer-events-auto data-[state=open]:opacity-100"
             aria-label={`${title} の操作`}
           >
             <MoreVertical className="size-4" />

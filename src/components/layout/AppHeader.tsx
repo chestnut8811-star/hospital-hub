@@ -1,5 +1,5 @@
 import { Bell, Hospital, LogOut, RefreshCw, Search, Siren, UserCog } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
@@ -20,6 +20,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { formatListTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
+import { getRoomTitle } from '@/features/chat/lib/roomHelpers'
 import { useChatStore } from '@/stores/chatStore'
 import { useDirectoryStore, useStaff } from '@/stores/directoryStore'
 import { useActiveDrill, useAnnouncements, useHubStore } from '@/stores/hubStore'
@@ -27,7 +28,7 @@ import { useCurrentUser, useSessionStore } from '@/stores/sessionStore'
 import { useUiStore } from '@/stores/uiStore'
 import { ROLE_LABEL } from '@/types'
 
-/** 共通ヘッダー（56px）。設計書 §4 */
+/** 共通ヘッダー（56px）。設計指示 §4 */
 export function AppHeader({ className }: { className?: string }) {
   const navigate = useNavigate()
   const me = useCurrentUser()
@@ -38,10 +39,24 @@ export function AppHeader({ className }: { className?: string }) {
   const announcements = useAnnouncements()
   const drill = useActiveDrill()
   const rooms = useChatStore((s) => s.rooms)
+  const messages = useChatStore((s) => s.messages)
   const [resetOpen, setResetOpen] = useState(false)
 
   const unreadAnnouncements = announcements.filter((a) => !a.readUserIds.includes(me.id))
-  const emergencyRooms = rooms.filter((r) => !r.hidden && r.hasEmergency)
+  // 「未読かどうか」ではなく「確認したかどうか」で出す。
+  // 一度開いただけで緊急表示が消えると、確認操作が漏れるため。
+  const unconfirmedRoomIds = useMemo(() => {
+    const ids = new Set<string>()
+    for (const m of messages) {
+      if (m.deleted || m.priority !== 'emergency') continue
+      if (!m.ack?.required || m.ack.confirmedUserIds.includes(me.id)) continue
+      ids.add(m.roomId)
+    }
+    return ids
+  }, [messages, me.id])
+  const emergencyRooms = rooms.filter(
+    (r) => !r.hidden && r.memberIds.includes(me.id) && unconfirmedRoomIds.has(r.id),
+  )
   const needsSafetyAnswer = drill ? !drill.responses.some((r) => r.userId === me.id) : false
   const notificationCount =
     unreadAnnouncements.length + emergencyRooms.length + (needsSafetyAnswer ? 1 : 0)
@@ -70,7 +85,7 @@ export function AppHeader({ className }: { className?: string }) {
         </span>
         <span className="min-w-0">
           <span className="block truncate font-semibold leading-tight">院内ハブ</span>
-          <span className="hidden truncate text-[11px] leading-tight text-muted-foreground lg:block">
+          <span className="hidden truncate text-xs leading-tight text-muted-foreground lg:block">
             Hospital Communication Hub
           </span>
         </span>
@@ -140,11 +155,13 @@ export function AppHeader({ className }: { className?: string }) {
                   onClick={() => navigate(`/chat/${room.id}`)}
                   className="flex w-full items-start gap-2.5 px-4 py-2.5 text-left hover:bg-muted"
                 >
-                  <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-danger text-[10px] font-bold text-danger-foreground">
+                  <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-danger text-xs font-bold text-danger-foreground">
                     !
                   </span>
                   <span className="min-w-0">
-                    <span className="block text-sm font-medium">{room.name}</span>
+                    <span className="block text-sm font-medium">
+                      {getRoomTitle(room, me.id)}
+                    </span>
                     <span className="block text-xs text-muted-foreground">
                       未確認の緊急メッセージがあります
                     </span>
@@ -183,7 +200,7 @@ export function AppHeader({ className }: { className?: string }) {
               <p className="text-xs text-muted-foreground">
                 {me.department}・{me.jobTitle}
               </p>
-              <p className="mt-1 inline-flex rounded-md bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-secondary-foreground">
+              <p className="mt-1 inline-flex rounded-md bg-secondary px-1.5 py-0.5 text-xs font-medium text-secondary-foreground">
                 {ROLE_LABEL[me.role]}
               </p>
             </DropdownMenuLabel>

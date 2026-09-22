@@ -33,7 +33,7 @@ export interface NavItem {
   accent: string
 }
 
-/** メニュー画面のタイル（設計書 §10） */
+/** メニュー画面のタイル（設計指示 §10） */
 export const APP_TILES: NavItem[] = [
   {
     id: 'myroom',
@@ -113,7 +113,7 @@ export const APP_TILES: NavItem[] = [
   },
 ]
 
-/** 下部ナビゲーションの3タブ（設計書 §3） */
+/** 下部ナビゲーションの3タブ（設計指示 §3） */
 export const BOTTOM_TABS = [
   { id: 'groups', label: 'グループ', to: '/groups', icon: MessageSquare },
   { id: 'direct', label: '個人', to: '/direct', icon: User },

@@ -38,12 +38,15 @@ export function GlobalSearchDialog() {
   const results = useMemo(() => {
     const q = query.trim()
     if (!q) return null
+    // 自分が参加しているルームだけを検索対象にする（他人のDM・マイルームを出さない）
+    const myRooms = rooms.filter((r) => r.memberIds.includes(meId))
+    const myRoomIds = new Set(myRooms.map((r) => r.id))
     return {
-      rooms: rooms
+      rooms: myRooms
         .filter((r) => !r.hidden && matchesQuery(q, roomLabel(r, meId), r.description))
         .slice(0, LIMIT),
       messages: messages
-        .filter((m) => !m.deleted && matchesQuery(q, m.body, m.title))
+        .filter((m) => myRoomIds.has(m.roomId) && !m.deleted && matchesQuery(q, m.body, m.title))
         .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
         .slice(0, LIMIT),
       knowledge: knowledge

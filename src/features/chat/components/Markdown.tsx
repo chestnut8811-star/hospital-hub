@@ -32,8 +32,9 @@ export function Markdown({ children, className }: { children: string; className?
             <code className="rounded bg-muted px-1 py-0.5 font-mono text-[0.85em]" {...p} />
           ),
           hr: () => <hr className="my-4 border-border" />,
-          a: ({ children, ...p }: ComponentProps<'a'>) => (
-            <span className="text-primary underline underline-offset-2" {...p}>
+          // 院内限定のため外部リンクは開かせない。span に href を渡すと不正なHTMLになるので落とす。
+          a: ({ children, href }: ComponentProps<'a'>) => (
+            <span className="text-primary underline underline-offset-2" title={href}>
               {children}
             </span>
           ),

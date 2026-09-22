@@ -5,20 +5,23 @@ import { Button } from '@/components/ui/button'
 import { ChatRoom } from '@/features/chat/components/ChatRoom'
 import { RoomListPane } from '@/features/chat/components/RoomListPane'
 import { useRoom } from '@/stores/chatStore'
+import { useSessionStore } from '@/stores/sessionStore'
 
 /** チャット画面。PC では一覧を左に並べる2ペイン、スマホは全画面。 */
 export function ChatPage() {
   const { roomId } = useParams()
   const room = useRoom(roomId)
   const navigate = useNavigate()
+  const meId = useSessionStore((s) => s.currentUserId)
 
-  if (!room) {
+  // 参加していないルームは開けない（利用者を切り替えたときに他人のDMが見えないように）
+  if (!room || !room.memberIds.includes(meId)) {
     return (
       <div className="h-full overflow-y-auto">
         <EmptyState
           icon={MessageSquareX}
           title="チャットが見つかりません"
-          description="削除されたか、退出した可能性があります。"
+          description="削除されたか、参加していない可能性があります。"
           action={<Button onClick={() => navigate('/groups')}>グループ一覧へ</Button>}
         />
       </div>

@@ -85,7 +85,7 @@ export function SurveyAnswerForm({
               Q{index + 1}
               <span
                 className={cn(
-                  'ml-2 rounded-md px-1.5 py-0.5 text-[11px] font-semibold',
+                  'ml-2 rounded-md px-1.5 py-0.5 text-xs font-semibold',
                   question.required
                     ? 'bg-danger-soft text-danger'
                     : 'bg-muted text-muted-foreground',

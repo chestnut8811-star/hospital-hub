@@ -1,5 +1,8 @@
 # Hospital Communication Hub — 設計書（Phase 1: UIプロトタイプ）
 
+> コード内コメントの「設計指示 §n」は、依頼時に受け取った UI/UX 設計指示（§1〜§26）の節番号を指す。
+> 本書（docs/design.md）の §n とは別物。
+
 最終更新: 2026-09-22
 
 ## 1. 技術構成
@@ -72,17 +75,35 @@ src/data/*.json ──> mock/seed.ts（ISO日時を当日へシフト）──> 
 - 画面は **ストア経由でのみ** データに触る。`src/data/*.json` を画面から直接 import しない
 - Phase 3 で `repositories/` の実装を差し替えればバックエンドに繋がる、という前提を壊さない
 
-### ストア一覧
+### ストア一覧（実装に一致）
 
-| ストア | 持ち物 | 主なアクション |
-|---|---|---|
-| `useSessionStore` | `currentUser`, `isAuthenticated` | `login(userId)`, `logout()`, `switchUser(userId)` |
-| `useChatStore` | `rooms`, `messages`, `notes` | `sendMessage`, `markRoomRead`, `togglePin`, `toggleMute`, `hideRoom`, `addReaction`, `editMessage`, `deleteMessage`, `toggleSaved`, `togglePinnedMessage`, `setPriority`, `acknowledge`, `saveNote`, `createDirectRoom` |
-| `useHubStore` | `announcements`, `troubles`, `knowledge`, `safetyDrills`, `surveys` | `markAnnouncementRead`, `createAnnouncement`, `createTrouble`, `updateTroubleStatus`, `submitSafetyResponse`, `submitSurveyResponse`, `createSurvey` |
-| `useUiStore` | `commandOpen`, `toast` 等の一時状態 | — |
+| ストア | 永続化キー | 持ち物 | 主なアクション |
+|---|---|---|---|
+| `useSessionStore` | `hch.session.v1` | `currentUserId`, `isAuthenticated` | `login(userId)` / `logout()` / `switchUser(userId)`。派生フック `useCurrentUser()` `useHasRole()` |
+| `useDirectoryStore` | `hch.directory.v1` | `users`, `departments` | `updateUser` / `setRole` / `setActive` / `resetDemoData`。`getUser(id)` `useUser(id)` `useStaff()` |
+| `useChatStore` | `hch.chat.v1` | `rooms`, `messages`, `notes` | `sendMessage` / `markRoomRead` / `togglePin` / `toggleMute` / `setHidden` / `leaveRoom` / `createGroup` / `updateGroup` / `createDirectRoom` / `ensureMyRoom` / `toggleReaction` / `editMessage` / `deleteMessage` / `toggleSaved` / `togglePinnedMessage` / `setMessagePriority` / `acknowledge` / `votePoll` / `saveNote` / `recalcForViewer` / `resetDemoData` |
+| `useHubStore` | `hch.hub.v1` | `announcements`, `knowledge`, `troubles`, `troubleOptions`, `safetyDrills`, `surveys`, `auditLogs` | `markAnnouncementRead` / `createAnnouncement` / `createTrouble` / `updateTroubleStatus` / `addTroubleUpdate` / `assignTrouble` / `submitSafetyResponse` / `setDrillActive` / `submitSurveyResponse` / `createSurvey` / `setSurveyStatus` / `addAuditLog` / `resetDemoData` |
+| `useUiStore` | （永続化しない） | `searchOpen`, `aiSummaryRoomId` | `setSearchOpen` / `setAiSummaryRoomId` |
 
-`useChatStore` と `useHubStore` は永続化する（キー: `hch.chat.v1` / `hch.hub.v1`）。
 localStorage へのアクセスは必ず try/catch で保護されている（`src/lib/storage.ts`）。
+リポジトリ実装のファイル名は `src/repositories/hubRepository.ts`。
+
+**Phase 3 で差し替えるときに必要になる作業（現状では差し替えられない）**
+
+今の `HubRepository` は同期の `loadSeed()` しか持たず、書き込み（送信・報告・回答）はストア内部で完結している。
+また `const seed = repository.loadSeed()` を3ストアのトップレベルで実行しているため、非同期の待ち合わせを挟む場所がない。
+バックエンドに繋ぐ際は次の3つが必要になる:
+
+1. `HubRepository` を `Promise` を返す形にする（`loadSeed()` → `fetchSnapshot()`）
+2. 書き込み系メソッド（`sendMessage` / `createTrouble` / `submitSurveyResponse` など）を interface に足し、ストアのアクションから呼ぶ
+3. ストアの初期値を空にし、`AppShell` などで `hydrate()` を呼んでから描画する（読み込み中表示が必要）
+
+画面（`src/features/**`）はストア経由でしかデータに触れていないので、この3つを行っても画面側の変更はほぼ不要な構成にはなっている。
+
+**日付が変わったときの扱い**: 各ストアの `merge` は保存された `seededOn` が当日でなければ保存分を捨て、
+モックを作り直す。これは「いつデモしても今日の会話に見える」（要件 P4）ためで、
+日付をまたぐと前日の操作結果（送信メッセージ・ピン・報告・回答）は消える。
+同じ日のうちはリロードしても保持される（受け入れ条件4）。
 
 ## 5. 画面レイアウト
 
@@ -108,7 +129,9 @@ localStorage へのアクセスは必ず try/catch で保護されている（`s
 - ボタン既定の高さは44px（`Button` の `size="default"`）。密度が必要な管理画面のみ `size="sm"`
 - 空状態は `components/common/EmptyState.tsx`
 - 破壊的操作（削除・退出）は確認ダイアログを挟む
-- トーストは `sonner`（`toast()` を `@/components/ui/sonner` 経由で）
+- トーストは `import { toast } from 'sonner'`（`@/components/ui/sonner` は `Toaster` のみを export する）
+- AI かどうかは `senderId === AI_USER_ID` で判定する（`type === 'ai'` だけに頼らない）
+- 一覧・検索・チャットは、自分が `memberIds` に入っているルームだけを対象にする
 
 ## 7. タスク分解
 
@@ -137,3 +160,25 @@ npm run dev      # 目視確認（375px / 768px / 1440px）
 - 実在の患者・職員の情報を書かない。すべて架空
 - 臨床的な数値・手順・機器設定・薬剤名を創作しない。モック文面は運用連絡の範囲にとどめる
 - 画面のどこかに「デモ用ダミーデータ／臨床判断には使用しない」旨を表示する
+
+## 10. 配布・運用の前提（Phase 1 時点）
+
+- `dist/index.html` は `/assets/...` の絶対パスを参照する（`vite.config.ts` に `base` 指定なし）。
+  サブディレクトリ配信や `file://` 直開きでは動かない
+- ルーティングは `createBrowserRouter`（History API）。`/groups` などを直接開けるようにするには、
+  静的サーバ側で **SPA フォールバック**（見つからないパスを `index.html` に返す）が必要
+- サブディレクトリ配信が必要になったら `vite.config.ts` の `base` と `createBrowserRouter` の
+  `basename` を合わせて設定する。ハッシュルーター（`createHashRouter`）に替えればフォールバック不要
+- 外部通信はゼロ。フォント（Geist Variable）を含め依存はすべて `dist/assets/` に同梱される
+
+## 11. 既知の割り切り（Phase 1）
+
+| 内容 | 理由 |
+|---|---|
+| 初期バンドルが単一チャンク（約 1,009 kB / gzip 294 kB） | 受け入れ条件に無いため未分割。route 単位の `React.lazy` で分割できる |
+| 時刻・バッジ・補助情報が 12px（要件の最小14pxより小さい） | 読ませる文字（本文・ナビのラベル・画面サブタイトル）は14px以上にしたが、チャットの時刻や既読数まで14pxにすると情報の主従が崩れるため据え置いた |
+| 複数タブを同時に開くと `localStorage` が後勝ちになる | `storage` イベントの購読を入れていない |
+| 端末のタイムゾーンが JST 以外だと日付リベースが1日ずれる | 院内端末は JST 前提 |
+| `src/data/*.json` と `src/lib/navigation.ts` に色を直書きしている | アバター色・グループ色・タイル色は「データの一部」として扱う。ダークモードを有効化するときは要見直し |
+| 既存グループのメンバー追加・削除、部署の追加・削除の画面が無い | `chatStore.updateGroup` は用意してあるが UI は未実装。Phase 9（管理）の範囲として残す。ログイン画面の権限説明からは「メンバー管理」を外した |
+| 同じ日のうちは保存データが新しいモックより優先される | 開発中に `src/data/*.json` を直しても、その日すでに開いていると反映されない。ヘッダー →「デモデータを初期化」で反映される。保存データの形を変えたときは各ストアの `version` を上げる |

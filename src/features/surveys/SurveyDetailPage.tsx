@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { SurveyAnswerForm } from '@/features/surveys/SurveyAnswerForm'
 import { SurveyResults } from '@/features/surveys/SurveyResults'
 import { formatDateTime } from '@/lib/format'
+import { isVisibleToUser } from '@/lib/targeting'
 import { useHubStore } from '@/stores/hubStore'
 import { useCurrentUser } from '@/stores/sessionStore'
 import type { SurveyAnswer, SurveyQuestion } from '@/types'
@@ -55,8 +56,15 @@ export function SurveyDetailPage() {
   }
 
   const closed = survey.status === 'closed'
-  const showResults = closed || isAdmin
-  const showForm = !closed && (!myResponse || editing)
+  // 回答前に集計を見せると回答が引っ張られるため、
+  // 実施中は「自分が回答したあと」だけ集計を出す（終了後と管理者は常に見られる）。
+  const showResults = closed || isAdmin || !!myResponse
+  // 配信対象外の職員が回答すると集計が崩れるので、回答フォームは出さない
+  const targeted = isVisibleToUser(
+    { targets: survey.targets, authorId: survey.createdBy },
+    { id: me.id, department: me.department },
+  )
+  const showForm = !closed && targeted && (!myResponse || editing)
 
   return (
     <div className="scrollbar-slim h-full overflow-y-auto">
@@ -124,6 +132,12 @@ export function SurveyDetailPage() {
               </Button>
             )}
           </section>
+        )}
+
+        {!targeted && !closed && (
+          <p className="mb-4 rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">
+            このアンケートの配信対象は「{survey.targets.join('・')}」です。回答はできませんが内容は閲覧できます。
+          </p>
         )}
 
         {showForm && (

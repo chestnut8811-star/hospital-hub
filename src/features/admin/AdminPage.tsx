@@ -1,12 +1,12 @@
 /**
- * 管理画面（ルート `/admin` `/admin/:section`、設計書 §19 §20）。
+ * 管理画面（ルート `/admin` `/admin/:section`、設計指示 §19 §20）。
  *
  * PC 前提の画面だが、スマホでも破綻しないようにサブナビは横スクロールのタブ列になる。
  * どの権限にどのセクションを見せるかは `adminSections.ts` の定義だけで決める。
  */
 import { ShieldAlert } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { DemoNotice } from '@/components/common/DemoNotice'
 import { EmptyState } from '@/components/common/EmptyState'
@@ -17,6 +17,7 @@ import { useCurrentUser } from '@/stores/sessionStore'
 import { hasRole, ROLE_LABEL } from '@/types'
 import type { AdminSectionId } from '@/features/admin/adminSections'
 import {
+  ADMIN_ENTRY_ROLE,
   ADMIN_SECTIONS,
   DEFAULT_ADMIN_SECTION,
   findAdminSection,
@@ -61,22 +62,30 @@ export function AdminPage() {
   // 自分の権限で開けるセクションだけをサブナビに出す
   const visible = useMemo(() => ADMIN_SECTIONS.filter((s) => hasRole(me.role, s.minRole)), [me.role])
 
+  // スマホの横スクロールタブでは、開いている項目を横方向だけ画面内に寄せる。
+  // ref コールバックのままだと再描画のたびに走り、縦スクロール位置まで戻ってしまう。
+  const activeTabRef = useRef<HTMLAnchorElement>(null)
+  useEffect(() => {
+    activeTabRef.current?.scrollIntoView({ block: 'nearest', inline: 'center' })
+  }, [section])
+
   const requested = findAdminSection(section)
   const current = requested && hasRole(me.role, requested.minRole) ? requested : undefined
 
-  if (!hasRole(me.role, 'GROUP_ADMIN')) {
+  if (!hasRole(me.role, ADMIN_ENTRY_ROLE)) {
     return (
       <AdminFrame>
         <EmptyState
           icon={ShieldAlert}
           title="この画面を表示する権限がありません"
-          description={`管理画面はグループ管理者以上が利用できます。現在の権限は「${ROLE_LABEL[me.role]}」です。`}
+          description={`管理画面は${ROLE_LABEL[ADMIN_ENTRY_ROLE]}以上が利用できます。現在の権限は「${ROLE_LABEL[me.role]}」です。`}
           action={
             <Button asChild>
               <Link to="/menu">メニューへ戻る</Link>
             </Button>
           }
         />
+        <DemoNotice className="mt-4" />
       </AdminFrame>
     )
   }
@@ -93,14 +102,7 @@ export function AdminPage() {
                 <li key={item.id} className="shrink-0">
                   <Link
                     to={`/admin/${item.id}`}
-                    // スマホの横スクロールタブでは、開いている項目を画面内に寄せる
-                    ref={
-                      active
-                        ? (el) => {
-                            el?.scrollIntoView({ block: 'nearest', inline: 'center' })
-                          }
-                        : undefined
-                    }
+                    ref={active ? activeTabRef : undefined}
                     aria-current={active ? 'page' : undefined}
                     className={cn(
                       'flex min-h-11 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors lg:w-full',

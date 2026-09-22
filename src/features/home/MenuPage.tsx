@@ -1,5 +1,5 @@
 /**
- * メニュー画面（設計書 §10）。
+ * メニュー画面（設計指示 §10）。
  *
  * 院内機能への入口をタイルで並べる。上部には「今すぐ見るべきもの」
  * （未回答の安否確認・最新のお知らせ）を置き、タイルは権限で出し分ける。
@@ -13,6 +13,7 @@ import { PageHeader } from '@/components/layout/PageHeader'
 import { Button } from '@/components/ui/button'
 import { formatBadgeCount, formatDateTime } from '@/lib/format'
 import { APP_TILES, type NavItem } from '@/lib/navigation'
+import { isVisibleToUser } from '@/lib/targeting'
 import { cn } from '@/lib/utils'
 import {
   useActiveDrill,
@@ -34,7 +35,7 @@ interface TileBadge {
 export function MenuPage() {
   const me = useCurrentUser()
   const announcements = useAnnouncements()
-  const unreadAnnouncements = useUnreadAnnouncementCount(me.id)
+  const unreadAnnouncements = useUnreadAnnouncementCount(me.id, me.department)
   const openTroubles = useOpenTroubleCount()
   const openSurveys = useOpenSurveyCount()
   const drill = useActiveDrill()
@@ -43,7 +44,14 @@ export function MenuPage() {
   const safetyPending = Boolean(drill && !drill.responses.some((r) => r.userId === me.id))
 
   const tiles = useMemo(() => APP_TILES.filter((tile) => hasRole(me.role, tile.minRole)), [me.role])
-  const latestAnnouncements = useMemo(() => announcements.slice(0, 3), [announcements])
+  // 一覧・バッジと同じ母集団にする（自分が配信したものは対象外でも見せる）
+  const latestAnnouncements = useMemo(
+    () =>
+      announcements
+        .filter((a) => isVisibleToUser(a, { id: me.id, department: me.department }))
+        .slice(0, 3),
+    [announcements, me.department, me.id],
+  )
 
   function badgeOf(tile: NavItem): TileBadge | null {
     switch (tile.badge) {
@@ -136,7 +144,7 @@ export function MenuPage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         {unread && (
-                          <span className="rounded-md bg-primary px-1.5 py-0.5 text-[11px] font-bold leading-none text-primary-foreground">
+                          <span className="rounded-md bg-primary px-1.5 py-0.5 text-xs font-bold leading-none text-primary-foreground">
                             NEW
                           </span>
                         )}
@@ -200,7 +208,7 @@ export function MenuPage() {
                     {badge && (
                       <span
                         className={cn(
-                          'absolute right-2 top-2 inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-bold leading-none tabular-nums',
+                          'absolute right-2 top-2 inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-xs font-bold leading-none tabular-nums',
                           badge.tone === 'danger'
                             ? 'bg-danger text-danger-foreground'
                             : 'bg-primary text-primary-foreground',

@@ -14,7 +14,7 @@ export function UnreadBadge({ count, emergency, muted, className }: UnreadBadgeP
   return (
     <span
       className={cn(
-        'inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-bold leading-none tabular-nums',
+        'inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-xs font-bold leading-none tabular-nums',
         emergency
           ? 'bg-danger text-danger-foreground'
           : muted

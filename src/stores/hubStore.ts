@@ -5,8 +5,10 @@ import { useMemo } from 'react'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { todayKey } from '@/lib/demoDay'
+import { SEED_REVISION } from '@/mock/seed'
 import { uid } from '@/lib/id'
 import { safeStorage } from '@/lib/storage'
+import { isVisibleToUser } from '@/lib/targeting'
 import { repository } from '@/repositories/hubRepository'
 import { useChatStore } from '@/stores/chatStore'
 import { currentUserId } from '@/stores/sessionStore'
@@ -60,6 +62,7 @@ const TROUBLE_ROOM_ID = 'room-trouble'
 
 interface HubState {
   seededOn: string
+  seedRevision: number
   announcements: Announcement[]
   knowledge: KnowledgeDoc[]
   troubles: TroubleReport[]
@@ -99,6 +102,7 @@ export const useHubStore = create<HubState>()(
   persist(
     (set, get) => ({
       seededOn: todayKey(),
+      seedRevision: SEED_REVISION,
       announcements: seed.announcements,
       knowledge: seed.knowledge,
       troubles: seed.troubles,
@@ -109,13 +113,16 @@ export const useHubStore = create<HubState>()(
 
       markAnnouncementRead: (id) => {
         const me = currentUserId()
-        set((s) => ({
-          announcements: s.announcements.map((a) =>
-            a.id === id && !a.readUserIds.includes(me)
-              ? { ...a, readUserIds: [...a.readUserIds, me] }
-              : a,
-          ),
-        }))
+        set((s) => {
+          const target = s.announcements.find((a) => a.id === id)
+          // 既読済みなら何もしない（毎回新しい配列を返すと localStorage への書き込みが走るため）
+          if (!target || target.readUserIds.includes(me)) return {}
+          return {
+            announcements: s.announcements.map((a) =>
+              a.id === id ? { ...a, readUserIds: [...a.readUserIds, me] } : a,
+            ),
+          }
+        })
       },
 
       createAnnouncement: (input) => {
@@ -143,8 +150,14 @@ export const useHubStore = create<HubState>()(
         // 採番は T-<年>-<月日>-<連番>。既存の同日分を接頭辞で数えて連番を続ける
         // （接頭辞以外で数えると seed の報告と ID が衝突して詳細画面が開けなくなる）
         const prefix = `T-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`
-        const sameDay = get().troubles.filter((t) => t.id.startsWith(`${prefix}-`)).length
-        const id = `${prefix}-${String(sameDay + 1).padStart(2, '0')}`
+        // 件数ではなく「同日の末尾番号の最大値 + 1」。
+        // 既存の番号が飛んでいても（seed の 0918 は -03 だけ）衝突しない。
+        const maxSuffix = get().troubles.reduce((max, t) => {
+          if (!t.id.startsWith(`${prefix}-`)) return max
+          const n = Number.parseInt(t.id.slice(prefix.length + 1), 10)
+          return Number.isNaN(n) ? max : Math.max(max, n)
+        }, 0)
+        const id = `${prefix}-${String(maxSuffix + 1).padStart(2, '0')}`
         const report: TroubleReport = {
           id,
           category: input.category,
@@ -162,7 +175,7 @@ export const useHubStore = create<HubState>()(
         }
         set((s) => ({ troubles: [report, ...s.troubles] }))
 
-        // 指定グループへ自動投稿する（設計書 §18）
+        // 指定グループへ自動投稿する（設計指示 §18）
         useChatStore.getState().sendMessage(TROUBLE_ROOM_ID, {
           body: [
             '🔧 機器トラブル報告',
@@ -230,10 +243,17 @@ export const useHubStore = create<HubState>()(
         }))
       },
 
-      setDrillActive: (drillId, active) =>
+      setDrillActive: (drillId, active) => {
         set((s) => ({
           safetyDrills: s.safetyDrills.map((d) => (d.id === drillId ? { ...d, active } : d)),
-        })),
+        }))
+        const drill = get().safetyDrills.find((d) => d.id === drillId)
+        get().addAuditLog(
+          active ? '安否確認の開始' : '安否確認の終了',
+          drill?.title ?? drillId,
+          active ? `対象 ${drill?.targetUserIds.length ?? 0} 名へ配信` : '受付を終了',
+        )
+      },
 
       submitSurveyResponse: (surveyId, answers) => {
         const me = currentUserId()
@@ -273,10 +293,17 @@ export const useHubStore = create<HubState>()(
         return id
       },
 
-      setSurveyStatus: (surveyId, status) =>
+      setSurveyStatus: (surveyId, status) => {
         set((s) => ({
           surveys: s.surveys.map((sv) => (sv.id === surveyId ? { ...sv, status } : sv)),
-        })),
+        }))
+        const survey = get().surveys.find((sv) => sv.id === surveyId)
+        get().addAuditLog(
+          status === 'closed' ? 'アンケートの締め切り' : 'アンケートの再開',
+          survey?.title ?? surveyId,
+          `回答 ${survey?.responses.length ?? 0} 件`,
+        )
+      },
 
       addAuditLog: (action, target, detail) =>
         set((s) => ({
@@ -297,6 +324,7 @@ export const useHubStore = create<HubState>()(
         const fresh = repository.loadSeed(currentUserId())
         set({
           seededOn: todayKey(),
+          seedRevision: SEED_REVISION,
           announcements: fresh.announcements,
           knowledge: fresh.knowledge,
           troubles: fresh.troubles,
@@ -310,8 +338,13 @@ export const useHubStore = create<HubState>()(
     {
       name: 'hch.hub.v1',
       storage: createJSONStorage(() => safeStorage),
+      // 保存データの形を変えたらここを上げる。migrate を置かないので古い保存分は捨てられる
+      version: 1,
+      // 版が変わったら保存分は捨てる（そのための merge があるので復元はしない）
+      migrate: () => undefined as never,
       partialize: (s) => ({
         seededOn: s.seededOn,
+        seedRevision: s.seedRevision,
         announcements: s.announcements,
         knowledge: s.knowledge,
         troubles: s.troubles,
@@ -321,7 +354,8 @@ export const useHubStore = create<HubState>()(
       }),
       merge: (persisted, current) => {
         const p = persisted as Partial<HubState> | undefined
-        if (!p || p.seededOn !== todayKey()) return current
+        // 日付が変わった／モックの版が上がったときは保存分を捨てて作り直す
+        if (!p || p.seededOn !== todayKey() || p.seedRevision !== SEED_REVISION) return current
         return { ...current, ...p }
       },
     },
@@ -338,11 +372,21 @@ export function useAnnouncements(): Announcement[] {
   )
 }
 
-export function useUnreadAnnouncementCount(userId: string): number {
+/**
+ * 未読のお知らせ件数。
+ * 一覧側が配信対象で絞っているので、バッジも同じ母集団で数える
+ * （自分が配信したものは対象外でも自分の一覧に出す）。
+ */
+export function useUnreadAnnouncementCount(userId: string, department: string): number {
   const announcements = useHubStore((s) => s.announcements)
   return useMemo(
-    () => announcements.filter((a) => !a.readUserIds.includes(userId)).length,
-    [announcements, userId],
+    () =>
+      announcements.filter(
+        (a) =>
+          !a.readUserIds.includes(userId) &&
+          isVisibleToUser(a, { id: userId, department }),
+      ).length,
+    [announcements, userId, department],
   )
 }
 

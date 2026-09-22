@@ -1,5 +1,5 @@
 /**
- * 院内ナレッジの記事詳細（設計書 §17）。
+ * 院内ナレッジの記事詳細（設計指示 §17）。
  * 本文は Markdown。臨床の手順は一次資料が正であることを画面上で明示する。
  */
 import { CalendarClock, Download, FileText, Info, Library, Sparkles, Tag } from 'lucide-react'

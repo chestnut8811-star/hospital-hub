@@ -16,7 +16,7 @@ import { useCurrentUser } from '@/stores/sessionStore'
 import type { Message, Room } from '@/types'
 import { hasRole } from '@/types'
 
-/** チャット画面本体。グループ・DM・マイルームで共通（設計書 §6） */
+/** チャット画面本体。グループ・DM・マイルームで共通（設計指示 §6） */
 export function ChatRoom({ room, className }: { room: Room; className?: string }) {
   const navigate = useNavigate()
   const me = useCurrentUser()
@@ -28,6 +28,14 @@ export function ChatRoom({ room, className }: { room: Room; className?: string }
   const [aiOpen, setAiOpen] = useState(false)
   const [replyTo, setReplyTo] = useState<Message | null>(null)
   const [editing, setEditing] = useState<Message | null>(null)
+
+  // ルームを開いた瞬間の未読を控える（この直後に markRoomRead で全既読になるため）。
+  // ChatRoom は key={room.id} で作り直されるので、初期化関数は1ルームにつき1回だけ走る。
+  const [unreadIdsAtOpen] = useState<string[]>(() =>
+    messages
+      .filter((m) => !m.deleted && m.senderId !== me.id && !m.readUserIds.includes(me.id))
+      .map((m) => m.id),
+  )
 
   useEffect(() => {
     markRoomRead(room.id)
@@ -70,7 +78,7 @@ export function ChatRoom({ room, className }: { room: Room; className?: string }
         <RoomAvatar room={room} peer={peer} size="sm" />
         <div className="min-w-0 flex-1">
           <p className="truncate font-semibold leading-tight">{title}</p>
-          <p className="truncate text-xs leading-tight text-muted-foreground">
+          <p className="truncate text-sm leading-tight text-muted-foreground">
             {getRoomSubtitle(room, me.id)}
           </p>
         </div>
@@ -128,6 +136,11 @@ export function ChatRoom({ room, className }: { room: Room; className?: string }
         </div>
       )}
 
+      {/* 配布物として取り違えられないよう、チャット画面にも常時表示する */}
+      <p className="shrink-0 border-b border-border bg-warning-soft px-3 py-1.5 text-sm leading-snug text-foreground">
+        デモ用のダミーデータです。臨床判断には使用しないでください。
+      </p>
+
       {/* 未確認の緊急メッセージ */}
       {unconfirmed.length > 0 && !query && (
         <div className="shrink-0 border-b border-danger/40 bg-danger-soft px-3 py-2 text-sm">
@@ -144,10 +157,12 @@ export function ChatRoom({ room, className }: { room: Room; className?: string }
       <div className="scrollbar-slim min-h-0 flex-1 overflow-y-auto">
         <MessageList
           messages={visible}
+          allMessages={messages}
           room={room}
           meId={me.id}
           canModerate={canModerate}
           query={query}
+          autoScroll={!query.trim()}
           onReply={(m) => {
             setEditing(null)
             setReplyTo(m)
@@ -182,6 +197,7 @@ export function ChatRoom({ room, className }: { room: Room; className?: string }
         roomName={title}
         messages={messages}
         meId={me.id}
+        unreadIds={unreadIdsAtOpen}
       />
     </div>
   )

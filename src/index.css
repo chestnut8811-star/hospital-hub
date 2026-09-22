@@ -72,6 +72,7 @@
     --color-ai-border: var(--ai-border);
     --color-bubble-me: var(--bubble-me);
     --color-bubble-me-foreground: var(--bubble-me-foreground);
+    --color-bubble-me-muted: var(--bubble-me-muted);
     --color-surface-sunken: var(--surface-sunken);
 
     --radius-sm: calc(var(--radius) * 0.6);
@@ -82,6 +83,12 @@
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
     --radius-msg: 14px;
+
+    /* 要件§4「最小フォント14px」。Tailwind 既定の text-xs は 12px なので上書きする。
+       時刻・バッジ・タグなど補助情報もすべて14px以上になる。
+       情報の主従を戻したいときは、この1行を消せば Tailwind 既定に戻る。 */
+    --text-xs: 0.875rem;
+    --text-xs--line-height: calc(1.25 / 0.875);
 
     /* 影は「非常に薄く」（設計書 §21） */
     --shadow-card: 0 1px 2px rgb(32 36 44 / 0.04), 0 1px 3px rgb(32 36 44 / 0.06);
@@ -109,8 +116,8 @@
     --accent-foreground: #2a3f74;
     --destructive: #c53b3b;
     --destructive-foreground: #ffffff;
-    --border: #e1e5ee;
-    --input: #d5dae5;
+    --border: #d9dfe9; /* 仕切り線（装飾）。1.4.11 の対象外だが見やすさのため少し濃く */
+    --input: #868f9f; /* 入力欄の枠。白地で 3.26:1（WCAG 1.4.11 の 3:1 を満たす） */
     --ring: #3157b7;
 
     /* 設計書 §21 の Danger #D64545 / Warning #E89C31 / Success #2F9E6F は、
@@ -137,6 +144,8 @@
     --ai-border: #ddd2f5;
     --bubble-me: #dbe5fa;
     --bubble-me-foreground: #1a2b4f;
+    /* 自分の吹き出し上では muted-foreground が 4.10:1 になるため専用の補助色を持つ（6.70:1） */
+    --bubble-me-muted: #3e4d6b;
     --surface-sunken: #eef1f7;
 
     --chart-1: #3157b7;
@@ -198,6 +207,7 @@
     --ai-border: #3d3360;
     --bubble-me: #2b3d63;
     --bubble-me-foreground: #eef1f7;
+    --bubble-me-muted: #c3ccdd;
     --surface-sunken: #1a1e26;
 
     --sidebar: #1c2029;
@@ -225,6 +235,8 @@
         /* iOS Safari のアドレスバーで高さが崩れないように */
         min-height: 100dvh;
         overscroll-behavior-y: none;
+        /* URL のように区切れない長い文字列で横スクロールが出ないようにする */
+        overflow-wrap: anywhere;
     }
     /* 見出しは字面を締める */
     h1, h2, h3, h4 {

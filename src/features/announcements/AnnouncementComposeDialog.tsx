@@ -196,7 +196,13 @@ export function AnnouncementComposeDialog({
         </div>
 
         <DialogFooter className="gap-2 sm:gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              reset()
+              onOpenChange(false)
+            }}
+          >
             キャンセル
           </Button>
           <Button disabled={!canSubmit} onClick={() => setConfirmOpen(true)}>

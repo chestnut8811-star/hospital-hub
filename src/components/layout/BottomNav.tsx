@@ -6,12 +6,12 @@ import { useTotalUnread } from '@/stores/chatStore'
 import { useCurrentUser } from '@/stores/sessionStore'
 import { useUnreadAnnouncementCount } from '@/stores/hubStore'
 
-/** スマホ・タブレットの下部ナビゲーション（設計書 §3） */
+/** スマホ・タブレットの下部ナビゲーション（設計指示 §3） */
 export function BottomNav({ className }: { className?: string }) {
   const groupUnread = useTotalUnread('group')
   const directUnread = useTotalUnread('direct')
   const me = useCurrentUser()
-  const announcementUnread = useUnreadAnnouncementCount(me.id)
+  const announcementUnread = useUnreadAnnouncementCount(me.id, me.department)
   const counts: Record<string, number> = {
     groups: groupUnread,
     direct: directUnread,
@@ -36,7 +36,7 @@ export function BottomNav({ className }: { className?: string }) {
                 to={tab.to}
                 className={({ isActive }) =>
                   cn(
-                    'relative flex h-16 flex-col items-center justify-center gap-1 text-xs font-medium transition-colors',
+                    'relative flex h-16 flex-col items-center justify-center gap-0.5 text-sm font-medium transition-colors',
                     isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
                   )
                 }

@@ -40,7 +40,7 @@ interface MessageActionsMenuProps {
   children: ReactNode
 }
 
-/** メッセージ長押しのメニュー（設計書 §7） */
+/** メッセージ長押しのメニュー（設計指示 §7） */
 export function MessageActionsMenu({
   message,
   meId,
@@ -74,7 +74,7 @@ export function MessageActionsMenu({
       {/*
         吹き出し自体を DropdownMenuTrigger にすると、Radix が pointerdown で開くため
         「軽くタップ・左クリックしただけ」でメニューが出てしまう。
-        設計書 §7 は「長押し」なので、トリガは見えないアンカーに任せ、
+        設計指示 §7 は「長押し」なので、トリガは見えないアンカーに任せ、
         開くかどうかは長押し・右クリック・キーボードの側で決める。
       */}
       <div className="relative">
@@ -88,20 +88,17 @@ export function MessageActionsMenu({
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent align={isMine ? 'end' : 'start'} className="w-56">
-          <div className="flex justify-between px-2 py-1.5">
+          {/* 素の button だと Radix のフォーカス管理の外に出てキーボードで辿れないので Item にする */}
+          <div className="flex justify-between px-1 py-1">
             {QUICK_REACTIONS.map((emoji) => (
-              <button
+              <DropdownMenuItem
                 key={emoji}
-                type="button"
                 aria-label={`${emoji} のリアクション`}
-                className="flex size-9 items-center justify-center rounded-full text-lg transition-colors hover:bg-muted"
-                onClick={() => {
-                  toggleReaction(message.id, emoji)
-                  onOpenChange(false)
-                }}
+                className="size-11 justify-center rounded-full p-0 text-lg"
+                onSelect={() => toggleReaction(message.id, emoji)}
               >
                 {emoji}
-              </button>
+              </DropdownMenuItem>
             ))}
           </div>
           <DropdownMenuSeparator />

@@ -45,7 +45,7 @@ export function PageHeader({
       <div className={cn('min-w-0 flex-1', hideBack && 'pl-2')}>
         <h1 className="truncate text-base font-semibold leading-tight">{title}</h1>
         {description && (
-          <p className="truncate text-xs leading-tight text-muted-foreground">{description}</p>
+          <p className="truncate text-sm leading-tight text-muted-foreground">{description}</p>
         )}
       </div>
       {actions && <div className="flex shrink-0 items-center gap-1">{actions}</div>}

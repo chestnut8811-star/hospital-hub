@@ -39,7 +39,7 @@ interface RoomMenuSheetProps {
   onOpenAiSummary: () => void
 }
 
-/** チャットヘッダーの ⋯ から開くルームメニュー（設計書 §9） */
+/** チャットヘッダーの ⋯ から開くルームメニュー（設計指示 §9） */
 export function RoomMenuSheet({
   room,
   meId,
@@ -114,7 +114,7 @@ export function RoomMenuSheet({
                         )}
                       </span>
                       {room.adminIds.includes(id) && (
-                        <span className="rounded bg-secondary px-1.5 py-0.5 text-[11px] text-secondary-foreground">
+                        <span className="rounded bg-secondary px-1.5 py-0.5 text-xs text-secondary-foreground">
                           管理者
                         </span>
                       )}

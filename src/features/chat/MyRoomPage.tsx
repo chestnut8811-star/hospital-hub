@@ -1,28 +1,23 @@
-import { NotebookPen } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
-import { EmptyState } from '@/components/common/EmptyState'
-import { Button } from '@/components/ui/button'
+import { useEffect, useState } from 'react'
 import { ChatRoom } from '@/features/chat/components/ChatRoom'
-import { useRoom } from '@/stores/chatStore'
-import { MY_ROOM_ID } from '@/types'
+import { useChatStore, useRoom } from '@/stores/chatStore'
+import { useSessionStore } from '@/stores/sessionStore'
 
-/** マイルーム（設計書 §11）。通常のチャットと同じUIで、自分だけが見られる。 */
+/**
+ * マイルーム（設計指示 §11）。通常のチャットと同じUIで、自分だけが見られる。
+ * 利用者を切り替えても他人のマイルームが見えないよう、自分のものを取得（無ければ作成）する。
+ */
 export function MyRoomPage() {
-  const room = useRoom(MY_ROOM_ID)
-  const navigate = useNavigate()
+  const meId = useSessionStore((s) => s.currentUserId)
+  const ensureMyRoom = useChatStore((s) => s.ensureMyRoom)
+  const [roomId, setRoomId] = useState<string | null>(null)
+  const room = useRoom(roomId ?? undefined)
 
-  if (!room) {
-    return (
-      <div className="h-full overflow-y-auto">
-        <EmptyState
-          icon={NotebookPen}
-          title="マイルームがありません"
-          description="デモデータを初期化すると復活します。"
-          action={<Button onClick={() => navigate('/menu')}>メニューへ戻る</Button>}
-        />
-      </div>
-    )
-  }
+  useEffect(() => {
+    setRoomId(ensureMyRoom())
+  }, [meId, ensureMyRoom])
+
+  if (!room) return null
 
   return (
     <div className="flex h-full">

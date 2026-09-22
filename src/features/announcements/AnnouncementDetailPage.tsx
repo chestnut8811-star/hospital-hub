@@ -12,10 +12,13 @@ import { UserAvatar } from '@/components/common/UserAvatar'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { formatFullDateTime } from '@/lib/format'
 import { useUser } from '@/stores/directoryStore'
+import { isVisibleToUser } from '@/lib/targeting'
 import { useHubStore } from '@/stores/hubStore'
+import { useCurrentUser } from '@/stores/sessionStore'
 
 export function AnnouncementDetailPage() {
   const { announcementId } = useParams<{ announcementId: string }>()
+  const me = useCurrentUser()
   const announcements = useHubStore((s) => s.announcements)
   const markAnnouncementRead = useHubStore((s) => s.markAnnouncementRead)
 
@@ -25,9 +28,29 @@ export function AnnouncementDetailPage() {
   )
   const author = useUser(announcement?.authorId ?? '')
 
+  // 配信対象外のお知らせは、URL を直接開いても中身を出さない（既読の母数が汚れるため）
+  const visible = announcement
+    ? isVisibleToUser(announcement, { id: me.id, department: me.department })
+    : false
+
   useEffect(() => {
-    if (announcementId) markAnnouncementRead(announcementId)
-  }, [announcementId, markAnnouncementRead])
+    if (announcementId && visible) markAnnouncementRead(announcementId)
+  }, [announcementId, markAnnouncementRead, visible])
+
+  if (announcement && !visible) {
+    return (
+      <div className="scrollbar-slim h-full overflow-y-auto">
+        <PageHeader title="お知らせ" backTo="/announcements" />
+        <div className="mx-auto w-full max-w-3xl px-4 py-4">
+          <EmptyState
+            icon={Megaphone}
+            title="このお知らせは自分あてではありません"
+            description={`配信対象は「${announcement.targets.join('・')}」です。一覧から自分あてのお知らせを選んでください。`}
+          />
+        </div>
+      </div>
+    )
+  }
 
   if (!announcement) {
     return (

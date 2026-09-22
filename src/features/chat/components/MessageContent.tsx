@@ -124,7 +124,7 @@ export function PollCard({ message, meId }: { message: Message; meId: string }) 
   )
 }
 
-/** 「確認しました」ボタン。重要メッセージに付く（設計書 §14） */
+/** 「確認しました」ボタン。重要メッセージに付く（設計指示 §14） */
 export function AckPanel({ message, meId, total }: { message: Message; meId: string; total: number }) {
   const acknowledge = useChatStore((s) => s.acknowledge)
   const ack = message.ack

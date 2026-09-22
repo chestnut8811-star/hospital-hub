@@ -7,6 +7,7 @@
  */
 import { getUser } from '@/stores/directoryStore'
 import type { Message } from '@/types'
+import { AI_USER_ID } from '@/types'
 
 export interface SummarySection {
   heading: string
@@ -15,18 +16,33 @@ export interface SummarySection {
 
 export interface AiSummaryResult {
   targetCount: number
+  /** 未読を対象にできたか（false なら直近の発言をまとめている） */
+  fromUnread: boolean
   sections: SummarySection[]
 }
 
 const DECISION = /(決まりました|確定|了解|承知|対応します|対応中|完了|更新しました|しました。)/
 const ACTION = /(お願い|ください|でしょうか|ですか|確認|回答|未回答|調整|教えて)/
 
-export function buildAiSummary(messages: Message[], viewerId: string): AiSummaryResult {
-  const target = messages
-    .filter((m) => !m.deleted && m.type !== 'system')
-    .filter((m) => m.senderId !== viewerId && !m.readUserIds.includes(viewerId))
+export function buildAiSummary(
+  messages: Message[],
+  viewerId: string,
+  /**
+   * ルームを開いた時点で未読だったメッセージのID。
+   * ルームを開くと即座に既読になるため、開いた瞬間の未読をここで受け取らないと
+   * 「未読◯件を要約」が常に0件になる。
+   */
+  unreadIds?: readonly string[],
+): AiSummaryResult {
+  // 過去のAI要約を材料に含めると「要約の要約」になり、原文から離れていく
+  const readable = messages.filter(
+    (m) => !m.deleted && m.type !== 'system' && m.type !== 'ai' && m.senderId !== AI_USER_ID,
+  )
+  const target = unreadIds
+    ? readable.filter((m) => unreadIds.includes(m.id))
+    : readable.filter((m) => m.senderId !== viewerId && !m.readUserIds.includes(viewerId))
   // 未読が無いときは直近の発言をまとめる
-  const source = target.length > 0 ? target : messages.filter((m) => !m.deleted && m.type !== 'system').slice(-10)
+  const source = target.length > 0 ? target : readable.slice(-10)
 
   const important: SummarySection['items'] = []
   const decisions: SummarySection['items'] = []
@@ -35,7 +51,10 @@ export function buildAiSummary(messages: Message[], viewerId: string): AiSummary
 
   for (const m of source) {
     const who = getUser(m.senderId).name
-    const text = (m.title ? `${m.title}：` : '') + m.body.replace(/\s+/g, ' ').trim().slice(0, 90)
+    const flat = m.body.replace(/\s+/g, ' ').trim()
+    // 途中で切れたことが分かるように「…」を付ける（切れた文が AI の作文に見えないように）
+    const quoted = flat.length > 90 ? `${flat.slice(0, 90)}…` : flat
+    const text = (m.title ? `${m.title}：` : '') + quoted
     const item = { text, who }
     if (m.priority === 'emergency' || m.priority === 'important') important.push(item)
     else if (ACTION.test(m.body)) actions.push(item)
@@ -50,5 +69,5 @@ export function buildAiSummary(messages: Message[], viewerId: string): AiSummary
     { heading: '参考情報', items: info },
   ].filter((s) => s.items.length > 0)
 
-  return { targetCount: source.length, sections }
+  return { targetCount: source.length, fromUnread: target.length > 0, sections }
 }

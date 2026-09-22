@@ -7,9 +7,10 @@ import { KNOWLEDGE_TYPE_LABEL } from '@/types'
 
 const STYLES: Record<KnowledgeDocType, { chip: string; Icon: LucideIcon }> = {
   manual: { chip: 'bg-secondary text-secondary-foreground', Icon: BookText },
-  faq: { chip: 'bg-info-soft text-secondary-foreground', Icon: MessagesSquare },
+  // secondary と info-soft は同じ色なので、FAQ は別系統（紫）にする
+  faq: { chip: 'bg-ai-soft text-ai', Icon: MessagesSquare },
   material: { chip: 'bg-muted text-foreground', Icon: Paperclip },
-  education: { chip: 'bg-success-soft text-foreground', Icon: GraduationCap },
+  education: { chip: 'bg-success-soft text-success', Icon: GraduationCap },
 }
 
 export function KnowledgeTypeBadge({

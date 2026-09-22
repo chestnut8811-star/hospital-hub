@@ -41,7 +41,7 @@ interface MessageComposerProps {
   onOpenAiSummary: () => void
 }
 
-/** 下部固定の入力欄（設計書 §8）。Enter=改行 / Ctrl+Enter=送信 */
+/** 下部固定の入力欄（設計指示 §8）。Enter=改行 / Ctrl+Enter=送信 */
 export function MessageComposer({
   roomId,
   replyTo,
@@ -57,11 +57,11 @@ export function MessageComposer({
   const [pollOpen, setPollOpen] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
+  // 編集を始めたら本文を読み込み、編集をやめたら消す。
+  // （返信に切り替えたときに編集中の本文が残って、そのまま新規投稿されるのを防ぐ）
   useEffect(() => {
-    if (editing) {
-      setText(editing.body)
-      textareaRef.current?.focus()
-    }
+    setText(editing ? editing.body : '')
+    if (editing) textareaRef.current?.focus()
   }, [editing])
 
   useEffect(() => {
